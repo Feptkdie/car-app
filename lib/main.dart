@@ -1,7 +1,7 @@
-import 'package:car/constants.dart';
+import 'package:carpro/constants.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/auth/login_page.dart';
+import 'pages/home/home_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,12 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'CarPro',
       theme: ThemeData(
         primaryColor: kPrimaryColor,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginPage(),
+      home: HomePage(),
     );
   }
 }
