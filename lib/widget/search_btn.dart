@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-// import 'dart:convert';
-// import 'package:http/http.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class SearchBtn extends StatefulWidget {
   final String searchText;
@@ -39,52 +38,64 @@ class _SearchBtnState extends State<SearchBtn> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.height * 0.4,
-      height: MediaQuery.of(context).size.height * 0.06,
-      margin: EdgeInsets.only(
+    return Padding(
+      padding: EdgeInsets.only(
         left: MediaQuery.of(context).size.height * 0.02,
-        right: MediaQuery.of(context).size.height * 0.02,
+        right: MediaQuery.of(context).size.height * 0.015,
       ),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: TextFormField(
-        onChanged: (String text) {
-          if (_debounce?.isActive ?? false) _debounce.cancel();
-          _debounce = Timer(const Duration(milliseconds: 1000), () {
-            _search();
-          });
-        },
-        controller: _controller,
-        decoration: InputDecoration(
-          hintText: widget.searchText,
-          // hintTextDirection: TextDirection.ltr,
-          contentPadding:
-              EdgeInsets.all(MediaQuery.of(context).size.height * 0.009),
-          hintStyle: TextStyle(
-            fontFamily: "Montserrat",
-            fontSize: MediaQuery.of(context).size.height * 0.022,
+      child: Neumorphic(
+        style: NeumorphicStyle(
+          //   border: NeumorphicBorder(
+          // color: Color(0x33000000),
+          // width: 0.8,),
+          depth: -2,
+          shadowLightColorEmboss: Colors.white,
+          shadowDarkColorEmboss: Colors.grey,
+          color: Color(0xffc1c4c7),
+          boxShape: NeumorphicBoxShape.roundRect(
+            BorderRadius.circular(20),
           ),
-          border: InputBorder.none,
-          // icon:
-          // IconButton(
-          //   icon: Icon(Icons.search),
-          //   onPressed: () {
-          //     print("clicked");
-          //   },
-          // ),
-          prefixIcon: IconButton(
-            icon: Icon(
-              Icons.search,
-              color: Colors.grey,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.06,
+            maxWidth: MediaQuery.of(context).size.height * 0.3,
+          ),
+          child: Container(
+            // width: MediaQuery.of(context).size.height * 0.1,
+            // height: MediaQuery.of(context).size.height * 0.06,
+            child: TextFormField(
+              onChanged: (String text) {
+                if (_debounce?.isActive ?? false) _debounce.cancel();
+                _debounce = Timer(const Duration(milliseconds: 1000), () {
+                  _search();
+                });
+              },
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: widget.searchText,
+                // hintTextDirection: TextDirection.ltr,
+                contentPadding:
+                    EdgeInsets.all(MediaQuery.of(context).size.height * 0.009),
+                hintStyle: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontSize: MediaQuery.of(context).size.height * 0.018,
+                  color: Colors.grey[600],
+                ),
+                border: InputBorder.none,
+                prefixIcon: IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    color: Colors.grey[600],
+                  ),
+                  onPressed: () {
+                    print("clicked");
+                  },
+                ),
+                // prefixStyle:
+              ),
             ),
-            onPressed: () {
-              print("clicked");
-            },
           ),
-          // prefixStyle:
         ),
       ),
     );
