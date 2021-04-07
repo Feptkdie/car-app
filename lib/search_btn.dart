@@ -40,7 +40,7 @@ class _SearchBtnState extends State<SearchBtn> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: MediaQuery.of(context).size.height * 0.02,
+        left: MediaQuery.of(context).size.height * 0.3,
         right: MediaQuery.of(context).size.height * 0.015,
       ),
       child: Neumorphic(
@@ -58,12 +58,12 @@ class _SearchBtnState extends State<SearchBtn> {
         ),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.06,
+            maxHeight: MediaQuery.of(context).size.height * 0.04,
             maxWidth: MediaQuery.of(context).size.height * 0.3,
           ),
           child: Container(
-            // width: MediaQuery.of(context).size.height * 0.1,
-            // height: MediaQuery.of(context).size.height * 0.06,
+            width: MediaQuery.of(context).size.height * 0.1,
+            height: MediaQuery.of(context).size.height * 0.06,
             child: TextFormField(
               onChanged: (String text) {
                 if (_debounce?.isActive ?? false) _debounce.cancel();
