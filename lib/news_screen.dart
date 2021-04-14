@@ -2,7 +2,7 @@ import 'package:carpro/news_detail_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:carpro/news_appBar.dart';
 import 'news_appBar.dart';
 
 class NewsScreen extends StatefulWidget {
@@ -16,14 +16,13 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.grey,
-      //   title: Text("Мэдээлэл"),
-      // ),
+      appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.1),
+          child: NewsAppBar()),
       backgroundColor: Color(0xffd0d3d5),
       body: Column(
         children: <Widget>[
-          NewsAppBar(),
           _listView(context),
         ],
       ),
