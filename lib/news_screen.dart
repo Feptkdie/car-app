@@ -1,9 +1,12 @@
 import 'package:carpro/news_detail_screen.dart';
+import 'package:carpro/widget/search_btn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:intl/intl.dart';
-import 'package:carpro/news_appBar.dart';
-import 'news_appBar.dart';
+import 'constants.dart';
+import 'widget/appBar_title.dart';
+import 'widget/arrow_button.dart';
 
 class NewsScreen extends StatefulWidget {
   @override
@@ -16,11 +19,28 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-          preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.1),
-          child: NewsAppBar()),
       backgroundColor: Color(0xffd0d3d5),
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.1),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height * 0.05,
+            bottom: MediaQuery.of(context).size.height * 0.02,
+          ),
+          child: Row(
+            children: [
+              ArrowButton(),
+              AppBarTitle(title: "Мэдээ"),
+              Expanded(
+                child: SearchBtn(
+                  searchText: "Хайлтын түлхүүр үг",
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Column(
         children: <Widget>[
           _listView(context),
@@ -34,144 +54,181 @@ class _NewsScreenState extends State<NewsScreen> {
       child: ListView.builder(
         controller: ScrollController(),
         scrollDirection: Axis.vertical,
-        itemBuilder: (BuildContext ctx, int index) {
+        itemBuilder: (BuildContext context, int index) {
           return Stack(
             children: [
-              Container(
-                margin: EdgeInsets.only(
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.01,
                     left: MediaQuery.of(context).size.height * 0.03,
                     right: MediaQuery.of(context).size.height * 0.03,
                     bottom: MediaQuery.of(context).size.height * 0.02),
-                height: MediaQuery.of(context).size.height * 0.3,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.grey[200],
-                      Colors.grey[400],
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black45,
-                        blurRadius: 5,
-                        offset: Offset(0, 3)),
-                  ],
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  // top: MediaQuery.of(context).size.height * 0.03,
-                  right: MediaQuery.of(context).size.height * 0.04,
-                  left: MediaQuery.of(context).size.height * 0.04,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.25,
-                      maxWidth: MediaQuery.of(context).size.height * 0.5,
+                child: Neumorphic(
+                  style: NeumorphicStyle(
+                    depth: 3,
+                    intensity: 0.7,
+                    shadowLightColor: Colors.white,
+                    shadowDarkColor: Colors.black87,
+                    boxShape: NeumorphicBoxShape.roundRect(
+                      BorderRadius.circular(5.0),
                     ),
-                    child: Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.05),
-                      height: MediaQuery.of(context).size.height * 0.17,
-                      width: MediaQuery.of(context).size.width / 1,
-                      // decoration: BoxDecoration(
-                      //   color: Colors.white,
-                      //   borderRadius: BorderRadius.circular(10),
-                      // ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: Image(
-                          image: AssetImage(
-                            "assets/car_bg.jpeg",
+                    lightSource: LightSource.topLeft,
+                    shape: NeumorphicShape.convex,
+                    surfaceIntensity: 1,
+                  ),
+                  child: Card(
+                    color: Colors.transparent,
+                    elevation: 0.0,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.26,
+                        // maxWidth: MediaQuery.of(context).size.height * 0.3,
+                      ),
+                      child: Column(
+                        // mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        "assets/clock.png",
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.012,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 5.0),
+                                        child: Text(
+                                          DateFormat('m').format(now) + "мин",
+                                          style: TextStyle(
+                                              fontFamily: "Montserrat",
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.01),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: -1,
+                                  child: InkWell(
+                                    child: Icon(
+                                      Icons.more_horiz,
+                                      size: MediaQuery.of(context).size.height *
+                                          0.03,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          fit: BoxFit.fill,
-                        ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.18,
+                              left: MediaQuery.of(context).size.height * 0.01,
+                              right: MediaQuery.of(context).size.height * 0.01,
+                              bottom:
+                                  MediaQuery.of(context).size.height * 0.005,
+                            ),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Авто лизингийн хүү  0,1% боллоо",
+                                    style: TextStyle(
+                                      fontFamily: "Montserrat",
+                                      fontSize:
+                                          MediaQuery.of(context).size.height *
+                                              0.016,
+                                      fontWeight: FontWeight.bold,
+                                      color: kTextColor,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    child:
+                                        //  Icon(
+                                        //   Icons.bookmark_border,
+                                        //   size: MediaQuery.of(context).size.height * 0.03,
+                                        // ),
+                                        Image.asset(
+                                      "assets/bookmark.png",
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.015,
+                                    ),
+                                  ),
+                                ]),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewsDetailScreen(),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.height * 0.01,
+                                right:
+                                    MediaQuery.of(context).size.height * 0.01,
+                              ),
+                              child: Text(
+                                "Үргэлжлүүлэн унших",
+                                style: TextStyle(
+                                  fontFamily: "Montserrat",
+                                  fontSize:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-              Column(
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.03,
-                      // bottom: MediaQuery.of(context).size.height *
-                      //     0.01
-                    ),
-                    dense: true,
-                    enabled: false,
-                    title: Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Icon(
-                            Icons.timelapse,
-                            size: MediaQuery.of(context).size.height * 0.02,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            DateFormat('m').format(now) + "мин",
-                            style: TextStyle(
-                                fontFamily: "Montserrat",
-                                fontSize:
-                                    MediaQuery.of(context).size.height * 0.016),
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: InkWell(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          right: MediaQuery.of(context).size.height * 0.04,
-                        ),
-                        child: Icon(Icons.more_horiz),
-                      ),
-                    ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height,
+                    maxWidth: MediaQuery.of(context).size.width,
                   ),
-                  ListTile(
-                    contentPadding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.13,
-                      left: MediaQuery.of(context).size.height * 0.04,
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.045,
                       right: MediaQuery.of(context).size.height * 0.04,
+                      left: MediaQuery.of(context).size.height * 0.04,
                     ),
-                    title: Text(
-                      "Авто лизингийн хүү  0,1% боллоо",
-                      style: TextStyle(
-                        fontFamily: "Montserrat",
-                        fontSize: MediaQuery.of(context).size.height * 0.018,
-                      ),
-                    ),
-                    subtitle: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NewsDetailScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        "Үргэлжлүүлэн унших",
-                        style: TextStyle(
-                          fontFamily: "Montserrat",
-                          fontSize: MediaQuery.of(context).size.height * 0.014,
+                    height: MediaQuery.of(context).size.height * 0.16,
+                    width: MediaQuery.of(context).size.width / 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Image(
+                        image: AssetImage(
+                          "assets/car_bg.jpeg",
                         ),
+                        fit: BoxFit.fill,
                       ),
-                    ),
-                    trailing: Icon(
-                      Icons.bookmark_border,
-                      size: MediaQuery.of(context).size.height * 0.03,
                     ),
                   ),
-                ],
-              )
+                ),
+              ),
             ],
           );
         },

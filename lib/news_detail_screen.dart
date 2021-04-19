@@ -1,5 +1,7 @@
-import 'package:carpro/cart.dart';
-import 'package:carpro/search_btn.dart';
+import 'package:carpro/widget/appBar_title.dart';
+import 'package:carpro/widget/arrow_button.dart';
+import 'package:carpro/widget/news_cart.dart';
+import 'package:carpro/widget/search_btn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -26,72 +28,8 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
           ),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop(context);
-                },
-                child: Theme.of(context).platform == TargetPlatform.iOS
-                    ? Padding(
-                        padding: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.height * 0.01),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 0.045,
-                          width: MediaQuery.of(context).size.height * 0.045,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(colors: [
-                              Colors.red[500],
-                              Colors.red[900],
-                            ]),
-                          ),
-                          child: CupertinoButton(
-                              color: Colors.transparent,
-                              // borderRadius: BorderRadius.circular(40),
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {}),
-                        ),
-                      )
-                    : Padding(
-                        padding: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.height * 0.01),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 0.045,
-                          width: MediaQuery.of(context).size.height * 0.045,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(colors: [
-                                Colors.red[500],
-                                Colors.red[900],
-                              ]),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black87,
-                                  blurRadius: 7,
-                                  offset: Offset(2, 2), // Shadow position
-                                ),
-                              ]),
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.height * 0.015),
-                child: Text(
-                  "Мэдээ",
-                  style: TextStyle(
-                      fontFamily: "Montserrat",
-                      fontSize: MediaQuery.of(context).size.height * 0.026,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800]),
-                ),
-              ),
+              ArrowButton(),
+              AppBarTitle(title: "Мэдээ"),
               Expanded(
                 child: SearchBtn(
                   searchText: "Хайлтын түлхүүр үг",
@@ -102,10 +40,8 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _cardWidget(context),
-          ],
+        child: Container(
+          child: _cardWidget(context),
         ),
       ),
     );
@@ -114,7 +50,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
   Widget _cardWidget(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext ctx, BoxConstraints constraints) {
-      return Cart();
+      return NewsCart();
     });
   }
 }
