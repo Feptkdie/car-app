@@ -61,7 +61,7 @@ class _SearchBtnState extends State<SearchBtn> {
         ),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.06,
+            maxHeight: MediaQuery.of(context).size.height * 0.065,
             // maxWidth: MediaQuery.of(context).size.height * 0.3,
           ),
           child: TextFormField(

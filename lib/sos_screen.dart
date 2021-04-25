@@ -50,7 +50,7 @@ class SosScreen extends StatelessWidget {
         top: MediaQuery.of(ctx).size.height * 0.02,
         right: MediaQuery.of(ctx).size.height * 0.03,
       ),
-      child: InkWell(
+      child: GestureDetector(
         onTap: () {
           Navigator.of(ctx).push(
             MaterialPageRoute(

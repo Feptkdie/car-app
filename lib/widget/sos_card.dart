@@ -55,9 +55,13 @@ class SosCard extends StatelessWidget {
                             ),
                             Padding(
                               padding: EdgeInsets.only(
-                                  top: MediaQuery.of(ctx).size.height * 0.02),
+                                top: MediaQuery.of(ctx).size.height * 0.02,
+                                left: MediaQuery.of(ctx).size.height * 0.01,
+                                right: MediaQuery.of(ctx).size.height * 0.01,
+                              ),
                               child: Text(
                                 cardItem[index].title,
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Color(0xFF556062),
                                   fontFamily: "Montserrat",

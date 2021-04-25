@@ -5,21 +5,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:intl/intl.dart';
-// import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'constants.dart';
 import 'widget/appBar_title.dart';
 import 'widget/arrow_button.dart';
 
-class NewsScreen extends StatefulWidget {
-  NewsScreen({this.url});
+class NewsScreenPlayer extends StatefulWidget {
+  NewsScreenPlayer({this.url});
   final url;
   @override
-  _NewsScreenState createState() => _NewsScreenState();
+  _NewsScreenPlayerState createState() => _NewsScreenPlayerState();
 }
 
 DateTime now = DateTime.now();
 
-class _NewsScreenState extends State<NewsScreen> {
+class _NewsScreenPlayerState extends State<NewsScreenPlayer> {
+  // YoutubePlayerController _controller;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,7 +163,12 @@ class _NewsScreenState extends State<NewsScreen> {
                                     ),
                                   ),
                                   InkWell(
-                                    child: Image.asset(
+                                    child:
+                                        //  Icon(
+                                        //   Icons.bookmark_border,
+                                        //   size: MediaQuery.of(context).size.height * 0.03,
+                                        // ),
+                                        Image.asset(
                                       "assets/bookmark.png",
                                       height:
                                           MediaQuery.of(context).size.height *
@@ -218,15 +224,30 @@ class _NewsScreenState extends State<NewsScreen> {
                     height: MediaQuery.of(context).size.height * 0.16,
                     width: MediaQuery.of(context).size.width / 1,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image(
-                        image: AssetImage(
-                          // listItem[index]['video'].toString(),
-                          "assets/car_bg.jpeg",
-                        ),
-                        fit: BoxFit.fill,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(5),
+                        // child: Image(
+                        //   image: AssetImage(
+                        //     listItem[index]['video'].toString(),
+                        //   ),
+                        //   fit: BoxFit.fill,
+                        // ),
+                        child: YoutubePlayerBuilder(
+                          player: YoutubePlayer(
+                            controller: YoutubePlayerController(
+                              initialVideoId: 'o2KveVr7adg',
+                              flags: YoutubePlayerFlags(
+                                hideControls: false,
+                                controlsVisibleAtStart: true,
+                                autoPlay: false,
+                              ),
+                            ),
+                          ),
+                          builder: (context, player) {
+                            return Container(
+                              child: player,
+                            );
+                          },
+                        )),
                   ),
                 ),
               ),
