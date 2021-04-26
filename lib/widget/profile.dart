@@ -5,11 +5,13 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class Profile extends StatelessWidget {
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(ctx).size.height * 0.065,
-      width: MediaQuery.of(ctx).size.height * 0.065,
-      margin: EdgeInsets.only(right: MediaQuery.of(ctx).size.height * 0.02),
+      height: MediaQuery.of(context).size.height * 0.065,
+      width: MediaQuery.of(context).size.height * 0.06,
+      margin: EdgeInsets.only(
+          left: MediaQuery.of(context).size.height * 0.38,
+          right: MediaQuery.of(context).size.height * 0.02),
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           image: DecorationImage(

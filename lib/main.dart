@@ -1,5 +1,4 @@
-import 'package:carpro/news_screen.dart';
-// import 'package:carpro/sos_screen.dart';
+import 'package:carpro/sale_detail_screen.dart.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xffd0d3d5),
         fontFamily: "Montserrat",
       ),
-      home: NewsScreen(),
+      home: SaleDetailScreen(),
     );
   }
 }

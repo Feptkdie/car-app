@@ -6,3 +6,7 @@ const kGreyColor = Color(0xFF7E8081);
 const kLightColor = Color(0xFFEAEAEB);
 const kRedColor = Color(0xFF7F1C24);
 const kLightRed = Color(0xFFED1C24);
+// const kGradient = LinearGradient(colors: [
+//   Color(0xFFED1C24),
+//   Color(0xFF7F1C24),
+// ]);
