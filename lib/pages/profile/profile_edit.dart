@@ -1,14 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../constants.dart';
-
-class ProfileData {
-  static List<Asset> profileImage = List<Asset>();
-  static List<Asset> coverImage = List<Asset>();
-  static List<Asset> carImage = List<Asset>();
-}
 
 class ProfileEdit extends StatefulWidget {
   static String routeName = "/profile_edit";
@@ -27,8 +21,7 @@ class _ProfileEditState extends State<ProfileEdit> {
   final carNameTEC = new TextEditingController();
   final carMarkTEC = new TextEditingController();
   final carNumberTEC = new TextEditingController();
-  List<Asset> _images = List<Asset>();
-  List<Asset> _carImages = List<Asset>();
+
   String _currentCategory = "Машин 1";
   bool _isLoad = true;
   @override
@@ -47,57 +40,6 @@ class _ProfileEditState extends State<ProfileEdit> {
       _isLoad = false;
     });
     super.initState();
-  }
-
-  // get image
-  Future getProfileImage() async {
-    try {
-      ProfileData.profileImage = await MultiImagePicker.pickImages(
-            maxImages: 1,
-            enableCamera: true,
-            selectedAssets: _images,
-            materialOptions: MaterialOptions(
-              actionBarTitle: "Зураг сонгох",
-            ),
-          ) ??
-          [];
-    } catch (e) {
-      print("multi image pick error = " + e.toString());
-    }
-  }
-
-  // get cover image
-  Future getCoverImage() async {
-    try {
-      ProfileData.coverImage = await MultiImagePicker.pickImages(
-            maxImages: 1,
-            enableCamera: true,
-            selectedAssets: _carImages,
-            materialOptions: MaterialOptions(
-              actionBarTitle: "Зураг сонгох",
-            ),
-          ) ??
-          [];
-    } catch (e) {
-      print("multi image pick error = " + e.toString());
-    }
-  }
-
-  // get car image
-  Future getCarImage() async {
-    try {
-      ProfileData.carImage = await MultiImagePicker.pickImages(
-            maxImages: 1,
-            enableCamera: true,
-            selectedAssets: _carImages,
-            materialOptions: MaterialOptions(
-              actionBarTitle: "Зураг сонгох",
-            ),
-          ) ??
-          [];
-    } catch (e) {
-      print("multi image pick error = " + e.toString());
-    }
   }
 
   @override
@@ -166,7 +108,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      getProfileImage();
+                      print("profile!");
                     },
                     child: Text(
                       "Profile",
@@ -190,7 +132,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                       child: InkWell(
                         splashColor: Colors.black,
                         onTap: () {
-                          getProfileImage();
+                          //
                         },
                         child: Image.asset(
                           "assets/images/me.jpg",
@@ -208,7 +150,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      getProfileImage();
+                      //
                     },
                     child: Text(
                       "Зураг оруулах",

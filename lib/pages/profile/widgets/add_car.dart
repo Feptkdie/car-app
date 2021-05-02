@@ -5,14 +5,9 @@ import 'package:carpro_app/helpers/user_preferences.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
-
-class AddCarData {
-  static List<Asset> images = List<Asset>();
-}
 
 class AddCar extends StatefulWidget {
   static String routeName = "/add_car";
@@ -36,25 +31,6 @@ class _AddCarState extends State<AddCar> {
     {"text": "Хүнд ММ", "value": "hund_mm"},
     {"text": "Мотоцикл", "value": "motorcycle"},
   ];
-
-  List<Asset> _images = List<Asset>();
-
-  // get image
-  // Future getImage() async {
-  //   try {
-  //     AddCarData.images = await MultiImagePicker.pickImages(
-  //           maxImages: 5,
-  //           enableCamera: true,
-  //           selectedAssets: _images,
-  //           materialOptions: MaterialOptions(
-  //             actionBarTitle: "Зураг сонгох",
-  //           ),
-  //         ) ??
-  //         [];
-  //   } catch (e) {
-  //     print("multi image pick error = " + e.toString());
-  //   }
-  // }
 
   @override
   void initState() {
@@ -251,6 +227,8 @@ class _AddCarState extends State<AddCar> {
                               body: json.encode(formData),
                             );
 
+                            print(response.body);
+
                             if (response.statusCode == 200) {
                               var result =
                                   json.decode(utf8.decode(response.bodyBytes));
@@ -258,7 +236,7 @@ class _AddCarState extends State<AddCar> {
                               if (result["success"]) {
                                 UserPreferences()
                                     .saveUserCars(json.encode(result["data"]));
-                                Navigator.pushNamed(
+                                Navigator.popAndPushNamed(
                                     context, "/profile_car_edit");
                               }
                             } else {
@@ -280,6 +258,7 @@ class _AddCarState extends State<AddCar> {
                             }
                           }
                         } else {
+                          UserPreferences().removeUser();
                           Navigator.pushNamed(context, "/login");
                         }
                       },

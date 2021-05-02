@@ -1,12 +1,13 @@
 import 'dart:convert';
 
+import 'package:carpro_app/helpers/app_url.dart';
 import 'package:carpro_app/helpers/user_preferences.dart';
 import 'package:carpro_app/models/user.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants.dart';
@@ -26,11 +27,19 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
   TextEditingController _markNameController;
   TextEditingController _countryNumberController;
 
+  String _carStringList;
+  String _curGroupName = "suudliin";
   String _selectedCarId;
 
-  @override
-  void initState() {
-    super.initState();
+  List<Map<String, dynamic>> groupNames = [
+    {"text": "Суудлын", "value": "suudliin"},
+    {"text": "Ачааны", "value": "achaanii"},
+    {"text": "Автобус", "value": "autobus"},
+    {"text": "Хүнд ММ", "value": "hund_mm"},
+    {"text": "Мотоцикл", "value": "motorcycle"},
+  ];
+
+  void fetchData() {
     _userPrefs = UserPreferences().getUser();
 
     _nameController = TextEditingController();
@@ -39,9 +48,11 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
 
     _userPrefs.then((User user) {
       print("user: $user");
-      var carList = json.decode(user.cars);
+      _carStringList = user.cars;
+      var carList = json.decode(_carStringList);
       if (carList.length > 0) {
         _selectedCarId = carList[0]["id"].toString();
+        _curGroupName = carList[0]["group_name"];
         _nameController.text = carList[0]["name"];
         _markNameController.text = carList[0]["mark_name"];
         _countryNumberController.text = carList[0]["country_number"];
@@ -52,7 +63,14 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print("mounted page");
     return Scaffold(
       backgroundColor: kBackColor2,
       appBar: AppBar(
@@ -65,62 +83,35 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
             onTap: () {
               Navigator.of(context).pop(context);
             },
-            child: Theme.of(context).platform == TargetPlatform.iOS
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                      ),
-                      child: CupertinoButton(
-                        color: Colors.transparent,
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black87,
-                            blurRadius: 7,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
-                    ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.height * 0.01,
+              ),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.045,
+                width: MediaQuery.of(context).size.height * 0.045,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.red[500],
+                      Colors.red[900],
+                    ],
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black87,
+                      blurRadius: 7,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ),
         title: Text(
@@ -130,6 +121,15 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            color: kColor3,
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "/add_car");
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<User>(
         future: _userPrefs,
@@ -149,33 +149,36 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                   return Center(child: Text("Нэвтрэх"));
                 } else {
                   // print(snapshot.data.cars);
-                  var carList = json.decode(snapshot.data.cars);
+                  var carList = json.decode(_carStringList);
+
+                  print(carList.length);
 
                   return SafeArea(
                     child: SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: FlatButton(
-                              color: kColor3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: Text(
-                                "Машин нэмэх",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, "/add_car");
-                              },
-                            ),
-                          ),
+                          // Container(
+                          //   padding: EdgeInsets.all(10.0),
+                          //   decoration: BoxDecoration(
+                          //     borderRadius: BorderRadius.circular(10.0),
+                          //   ),
+                          //   child: FlatButton(
+                          //     color: kColor3,
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(20.0),
+                          //     ),
+                          //     child: Text(
+                          //       "Машин нэмэх",
+                          //       style: TextStyle(
+                          //         color: Colors.white,
+                          //       ),
+                          //     ),
+                          //     onPressed: () {
+                          //       // Navigator.pushNamed(context, "/add_car");
+                          //       Navigator.popAndPushNamed(context, "/add_car");
+                          //     },
+                          //   ),
+                          // ),
                           if (carList.length > 0)
                             Container(
                               margin: EdgeInsets.all(20),
@@ -195,13 +198,12 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                     setState(() {
                                       _selectedCarId = val;
 
-                                      print("val: $val");
-
                                       var findCarId = carList.firstWhere(
                                           (car) => car["id"].toString() == val,
                                           orElse: () => null);
 
                                       if (findCarId != null) {
+                                        _curGroupName = findCarId["group_name"];
                                         _nameController.text =
                                             findCarId["name"];
                                         _markNameController.text =
@@ -209,200 +211,267 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                         _countryNumberController.text =
                                             findCarId["country_number"];
                                       }
-                                      print(findCarId);
-
-                                      // _curGroupName = val;
                                     });
                                   },
                                 ),
                               ),
                             ),
-                          Container(
-                            padding: EdgeInsets.all(20.0),
-                            child: Form(
-                              key: formKey,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  // ClipRRect(
-                                  //   borderRadius: BorderRadius.circular(35),
-                                  //   child: Image.asset(
-                                  //     "assets/images/child.png",
-                                  //     width: 70,
-                                  //   ),
-                                  // ),
-                                  // SizedBox(height: 30),
-                                  // DropdownButtonHideUnderline(
-                                  //   child: DropdownButton<String>(
-                                  //     isExpanded: true,
-                                  //     value: _curGroupName,
-                                  //     items: groupNames
-                                  //         .map<DropdownMenuItem<String>>((map) {
-                                  //       return DropdownMenuItem<String>(
-                                  //         value: map["value"],
-                                  //         child: Text(map["text"].toString()),
-                                  //       );
-                                  //     }).toList(),
-                                  //     onChanged: (val) {
-                                  //       setState(() {
-                                  //         _curGroupName = val;
-                                  //       });
-                                  //     },
-                                  //   ),
-                                  // ),
-                                  Container(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                      controller: _nameController,
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return 'Машины нэрээ оруулна уу!';
-                                        }
-                                        if (value.length <= 2) {
-                                          return 'Үсгийн хэмжээ бага байна!';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Машины нэр',
+                          if (carList.length > 0)
+                            Container(
+                              padding: EdgeInsets.all(20.0),
+                              child: Form(
+                                key: formKey,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    // ClipRRect(
+                                    //   borderRadius: BorderRadius.circular(35),
+                                    //   child: Image.asset(
+                                    //     "assets/images/child.png",
+                                    //     width: 70,
+                                    //   ),
+                                    // ),
+                                    // SizedBox(height: 30),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        value: _curGroupName,
+                                        items: groupNames
+                                            .map<DropdownMenuItem<String>>(
+                                                (map) {
+                                          return DropdownMenuItem<String>(
+                                            value: map["value"],
+                                            child: Text(map["text"].toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (val) {
+                                          setState(() {
+                                            _curGroupName = val;
+                                          });
+                                        },
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                      controller: _markNameController,
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return 'Үйлдвэрлэгчээ оруулна уу!';
-                                        }
-                                        if (value.length <= 2) {
-                                          return 'Үсгийн хэмжээ бага байна!';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Үйлдвэрлэгч',
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                      controller: _countryNumberController,
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return 'Улсын дугаар оруулна уу!';
-                                        }
-                                        if (value.length <= 2) {
-                                          return 'Үсгийн хэмжээ бага байна!';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Улсын дугаар',
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.0),
-                                  SizedBox(
-                                    width: 100.0,
-                                    height: 40,
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      ),
-                                      color: kTextGrey,
-                                      padding:
-                                          EdgeInsets.only(left: 5, right: 5),
-                                      onPressed: () async {
-                                        SharedPreferences prefs =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        String token =
-                                            prefs.getString("token") ?? null;
-
-                                        if (token != null) {
-                                          final form = formKey.currentState;
-
-                                          if (form.validate()) {
-                                            // final Map<String, dynamic>
-                                            //     formData = {
-                                            //   "group_name": _curGroupName,
-                                            //   "name": _nameController.text,
-                                            //   "mark_name":
-                                            //       _markNameController.text,
-                                            //   "country_number":
-                                            //       _countryNumberController.text
-                                            // };
-
-                                            // var response = await http.post(
-                                            //   AppUrl.baseURL +
-                                            //       "/profile-addcar",
-                                            //   headers: {
-                                            //     "Authorization":
-                                            //         "Bearer $token",
-                                            //     "Content-Type":
-                                            //         "application/json",
-                                            //     "Accept": "application/json",
-                                            //   },
-                                            //   body: json.encode(formData),
-                                            // );
-
-                                            // if (response.statusCode == 200) {
-                                            //   var result = json.decode(utf8
-                                            //       .decode(response.bodyBytes));
-
-                                            //   if (result["success"]) {
-                                            //     UserPreferences().saveUserCars(
-                                            //         json.encode(
-                                            //             result["data"]));
-                                            //     Navigator.pushNamed(context,
-                                            //         "/profile_car_edit");
-                                            //   }
-                                            // } else {
-                                            //   if (response.statusCode == 401) {
-                                            //     Navigator.pushNamed(
-                                            //         context, "/login");
-                                            //   } else {
-                                            //     Flushbar(
-                                            //       margin: EdgeInsets.all(8),
-                                            //       borderRadius: 8,
-                                            //       message: "Error",
-                                            //       duration:
-                                            //           Duration(seconds: 4),
-                                            //       icon: Icon(
-                                            //         Icons.info_outline,
-                                            //         size: 28.0,
-                                            //         color: Colors.blue[300],
-                                            //       ),
-                                            //     )..show(context);
-                                            //   }
-                                            // }
+                                    Container(
+                                      width: double.infinity,
+                                      child: TextFormField(
+                                        controller: _nameController,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Машины нэрээ оруулна уу!';
                                           }
-                                        } else {
-                                          Navigator.pushNamed(
-                                              context, "/login");
-                                        }
-                                      },
-                                      child: Text(
-                                        "Хадгалах",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
+                                          if (value.length <= 2) {
+                                            return 'Үсгийн хэмжээ бага байна!';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Машины нэр',
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      child: TextFormField(
+                                        controller: _markNameController,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Үйлдвэрлэгчээ оруулна уу!';
+                                          }
+                                          if (value.length <= 2) {
+                                            return 'Үсгийн хэмжээ бага байна!';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Үйлдвэрлэгч',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      child: TextFormField(
+                                        controller: _countryNumberController,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Улсын дугаар оруулна уу!';
+                                          }
+                                          if (value.length <= 2) {
+                                            return 'Үсгийн хэмжээ бага байна!';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Улсын дугаар',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 20.0),
+                                    Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: 100.0,
+                                          height: 40,
+                                          child: FlatButton(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.0),
+                                            ),
+                                            color: kTextGrey,
+                                            padding: EdgeInsets.only(
+                                                left: 5, right: 5),
+                                            onPressed: () async {
+                                              var token = snapshot.data.token;
+
+                                              if (token != null) {
+                                                final form =
+                                                    formKey.currentState;
+
+                                                if (form.validate()) {
+                                                  final Map<String, dynamic>
+                                                      formData = {
+                                                    "group_name": _curGroupName,
+                                                    "name":
+                                                        _nameController.text,
+                                                    "mark_name":
+                                                        _markNameController
+                                                            .text,
+                                                    "country_number":
+                                                        _countryNumberController
+                                                            .text
+                                                  };
+
+                                                  var response = await http.put(
+                                                    AppUrl.baseURL +
+                                                        "/profile-editcar/$_selectedCarId",
+                                                    headers: {
+                                                      "Authorization":
+                                                          "Bearer $token",
+                                                      "Content-Type":
+                                                          "application/json",
+                                                      "Accept":
+                                                          "application/json",
+                                                    },
+                                                    body: json.encode(formData),
+                                                  );
+
+                                                  if (response.statusCode ==
+                                                      200) {
+                                                    var result = json.decode(
+                                                        utf8.decode(response
+                                                            .bodyBytes));
+
+                                                    if (result["success"]) {
+                                                      print(result["data"]);
+
+                                                      UserPreferences()
+                                                          .saveUserCars(json
+                                                              .encode(result[
+                                                                  "data"]));
+
+                                                      Flushbar(
+                                                        margin:
+                                                            EdgeInsets.all(8),
+                                                        borderRadius: 8,
+                                                        message:
+                                                            "Амжилттай хадгалагдлаа",
+                                                        duration: Duration(
+                                                            seconds: 3),
+                                                        icon: Icon(
+                                                          Icons.info_outline,
+                                                          size: 28.0,
+                                                          color:
+                                                              Colors.blue[300],
+                                                        ),
+                                                      )..show(context);
+
+                                                      setState(() {
+                                                        _carStringList =
+                                                            json.encode(
+                                                                result["data"]);
+                                                      });
+                                                      // Navigator.popAndPushNamed(
+                                                      //     context, "/profile");
+                                                    }
+                                                  } else {
+                                                    print(response.statusCode);
+
+                                                    if (response.statusCode ==
+                                                        401) {
+                                                      UserPreferences()
+                                                          .removeUser();
+                                                      Navigator.pushNamed(
+                                                          context, "/login");
+                                                    } else {
+                                                      Flushbar(
+                                                        margin:
+                                                            EdgeInsets.all(8),
+                                                        borderRadius: 8,
+                                                        message: "Error",
+                                                        duration: Duration(
+                                                            seconds: 4),
+                                                        icon: Icon(
+                                                          Icons.info_outline,
+                                                          size: 28.0,
+                                                          color:
+                                                              Colors.blue[300],
+                                                        ),
+                                                      )..show(context);
+                                                    }
+                                                  }
+                                                }
+                                              } else {
+                                                UserPreferences().removeUser();
+                                                Navigator.pushNamed(
+                                                    context, "/login");
+                                              }
+                                            },
+                                            child: Text(
+                                              "Хадгалах",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        SizedBox(
+                                          width: 80.0,
+                                          height: 40,
+                                          child: FlatButton(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20.0),
+                                            ),
+                                            color: kBackColor1,
+                                            padding: EdgeInsets.only(
+                                                left: 5, right: 5),
+                                            onPressed: () async {
+                                              _showDeleteDialog(
+                                                  context,
+                                                  snapshot.data.token,
+                                                  _nameController.text);
+                                            },
+                                            child: Text(
+                                              "Устгах",
+                                              style: TextStyle(
+                                                color: kColor1,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -412,6 +481,95 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
           }
         },
       ),
+    );
+  }
+
+  Future<void> _showDeleteDialog(
+      BuildContext ctx, String token, String carName) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Анхааруулга"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("$carName машины мэдээлэлийг устгахад итгэлтэй байна уу?"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Үгүй"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                "Тийм",
+                style: TextStyle(color: kColor1),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+
+                var response = await http.delete(
+                    AppUrl.baseURL + "/profile-deletecar/$_selectedCarId",
+                    headers: {
+                      "Authorization": "Bearer $token",
+                      "Content-Type": "application/json",
+                      "Accept": "application/json",
+                    });
+
+                if (response.statusCode == 200) {
+                  var result = json.decode(utf8.decode(response.bodyBytes));
+
+                  if (result["success"]) {
+                    print(result["data"]);
+                    UserPreferences().saveUserCars(json.encode(result["data"]));
+                    Flushbar(
+                      margin: EdgeInsets.all(8),
+                      borderRadius: 8,
+                      message: "Амжилттай устгагдлаа",
+                      duration: Duration(seconds: 3),
+                      icon: Icon(
+                        Icons.info_outline,
+                        size: 28.0,
+                        color: Colors.blue[300],
+                      ),
+                    )..show(ctx);
+
+                    setState(() {
+                      fetchData();
+                      // _carStringList = json.encode(result["data"]);
+                    });
+                  }
+                } else {
+                  print(response.body);
+
+                  if (response.statusCode == 401) {
+                    UserPreferences().removeUser();
+                    Navigator.pushNamed(ctx, "/login");
+                  } else {
+                    Flushbar(
+                      margin: EdgeInsets.all(8),
+                      borderRadius: 8,
+                      message: "Error",
+                      duration: Duration(seconds: 4),
+                      icon: Icon(
+                        Icons.info_outline,
+                        size: 28.0,
+                        color: Colors.blue[300],
+                      ),
+                    )..show(ctx);
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
