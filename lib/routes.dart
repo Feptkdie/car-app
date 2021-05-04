@@ -1,4 +1,3 @@
-import 'package:carpro_app/pages/about/about_page.dart';
 import 'package:flutter/material.dart';
 import 'pages/splash/splash_page.dart';
 import 'pages/home/home_page.dart';
@@ -30,5 +29,4 @@ final Map<String, WidgetBuilder> routes = {
   AddCar.routeName: (context) => AddCar(),
   AddPart.routeName: (context) => AddPart(),
   EditPart.routeName: (context) => EditPart(),
-  AboutPage.routeName: (context) => AboutPage(),
 };
