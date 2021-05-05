@@ -434,7 +434,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                   height: widget.height * 0.1,
                   child: Center(
                     child: Text(
-                      "Хувийн\nтохиргоо",
+                      "Бүртгэл",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: kTextGrey,

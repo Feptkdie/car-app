@@ -226,29 +226,29 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        // SizedBox(height: 80),
-                        // SizedBox(
-                        //   width: 250,
-                        //   height: 40,
-                        //   child: FlatButton(
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(20.0),
-                        //     ),
-                        //     color: Colors.white,
-                        //     padding: EdgeInsets.only(left: 5, right: 5),
-                        //     onPressed: () {
-                        //       Navigator.pushNamed(context, "/register");
-                        //     },
-                        //     child: Text(
-                        //       "Бүртгүүлэх",
-                        //       style: TextStyle(
-                        //         color: Colors.black.withOpacity(0.7),
-                        //         fontWeight: FontWeight.bold,
-                        //         fontSize: 13,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        SizedBox(height: 80),
+                        SizedBox(
+                          width: 250,
+                          height: 40,
+                          child: FlatButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            color: Colors.white,
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/register");
+                            },
+                            child: Text(
+                              "Бүртгүүлэх",
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.7),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
                         // SizedBox(height: 10),
                         // SizedBox(
                         //   width: 250,

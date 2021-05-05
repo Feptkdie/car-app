@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:carpro_app/models/car.dart';
+import 'package:carpro_app/models/company.dart';
+import 'package:carpro_app/models/company_category.dart';
 import 'package:carpro_app/models/sos.dart';
+import 'package:carpro_app/providers/company_category_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carpro_app/models/sos_category.dart';
 import 'package:carpro_app/providers/sos_category_provider.dart';
@@ -106,6 +109,40 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     context.read<SosCategoryProvider>().setSosCategories(sosCategories);
   }
 
+  void setCompanyCategoryProvider(List<dynamic> list) {
+    List<CompanyCategory> companyCategories = [];
+
+    list.forEach((data) {
+      List<Company> companies = [];
+      data["companies"].forEach((item) {
+        var companyItem = {
+          "id": item["id"],
+          "name": item["name"],
+          "logo": item["logo"],
+          "address": item["address"],
+          "coordX": item["coordX"],
+          "coordY": item["coordY"],
+        };
+
+        Company company = Company.fromJson(companyItem);
+        companies.add(company);
+      });
+
+      var categoryItem = {
+        "id": data["id"],
+        "name": data["name"],
+        "companies": companies,
+      };
+
+      CompanyCategory companyCategory = CompanyCategory.fromJson(categoryItem);
+      companyCategories.add(companyCategory);
+    });
+
+    context
+        .read<CompanyCategoryProvider>()
+        .setCompanyCategories(companyCategories);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -116,6 +153,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     fetchData().then((data) {
       setCarProvider(data["cars"]);
       setSosCategoryProvider(data["sos_categories"]);
+      setCompanyCategoryProvider(data["company_categories"]);
 
       Navigator.pushReplacementNamed(context, "/home");
     }).catchError((error, stackTrace) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carpro_app/helpers/user_preferences.dart';
 import 'package:carpro_app/models/user.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +17,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Future<User> _userPrefs;
   bool isLogged = false;
+  User _currentUser;
+  dynamic _currentCar;
 
   @override
   void initState() {
@@ -28,6 +32,15 @@ class _ProfilePageState extends State<ProfilePage> {
         Navigator.pushReplacementNamed(context, "/login");
       } else {
         setState(() {
+          _currentUser = user;
+
+          if (_currentUser.cars != null) {
+            var cars = json.decode(_currentUser.cars);
+            if (cars.length > 0) _currentCar = cars[0];
+          }
+
+          print(_currentCar);
+
           isLogged = true;
         });
       }
@@ -72,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   _top(height),
-                  _info(height, width),
+                  if (_currentCar != null) _info(height, width),
                 ],
               ),
             ),
@@ -93,10 +106,15 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 height: height * 0.34,
                 width: double.infinity,
-                child: Image.asset(
-                  "assets/images/prius_profile.jpg",
-                  fit: BoxFit.cover,
-                ),
+                child: (_currentCar != null && _currentCar["cover"] != null)
+                    ? Image.network(
+                        _currentCar["cover"],
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        "assets/images/prius_profile.jpg",
+                        fit: BoxFit.cover,
+                      ),
               ),
               Container(
                 height: height * 0.34,
@@ -144,7 +162,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Padding(
                                 padding: EdgeInsets.only(left: height * 0.05),
                                 child: Text(
-                                  "УБА 2424",
+                                  (_currentCar != null &&
+                                          _currentCar["country_number"] != null)
+                                      ? _currentCar["country_number"]
+                                      : "",
                                   style: TextStyle(
                                     fontSize: height * 0.024,
                                     fontWeight: FontWeight.w500,
@@ -176,12 +197,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(
                       height * 0.2,
                     ),
-                    child: Image.asset(
-                      "assets/images/me.jpg",
-                      fit: BoxFit.cover,
-                      height: height * 0.14,
-                      width: height * 0.14,
-                    ),
+                    child: (_currentUser != null && _currentUser.avatar != "")
+                        ? Image.network(
+                            _currentUser.avatar,
+                            fit: BoxFit.cover,
+                            height: height * 0.14,
+                            width: height * 0.14,
+                          )
+                        : Image.asset(
+                            "assets/images/avatar.png",
+                            fit: BoxFit.cover,
+                            height: height * 0.14,
+                            width: height * 0.14,
+                          ),
                   ),
                 ),
               ),
@@ -193,7 +221,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     left: width * 0.05,
                   ),
                   child: Text(
-                    "TOYOTA",
+                    (_currentUser != null &&
+                            _currentCar != null &&
+                            _currentCar["mark_name"] != null)
+                        ? _currentCar["mark_name"]
+                        : "",
                     style: TextStyle(
                       fontSize: height * 0.018,
                       fontWeight: FontWeight.w300,
@@ -202,23 +234,58 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: height * 0.056,
-                    left: width * 0.05,
-                  ),
-                  child: Text(
-                    "PRIUS 30",
-                    style: TextStyle(
-                      fontSize: height * 0.023,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+              if (_currentUser != null && _currentCar != null)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: height * 0.056,
+                      left: width * 0.05,
+                    ),
+                    child: DropdownButton<String>(
+                      // isExpanded: true,
+                      dropdownColor: kPrimaryColor.withOpacity(0.8),
+                      value: _currentCar["id"].toString(),
+                      items: json
+                          .decode(_currentUser.cars)
+                          .map<DropdownMenuItem<String>>((map) {
+                        return DropdownMenuItem<String>(
+                          value: map["id"].toString(),
+                          child: Text(
+                            map["name"].toString(),
+                            style: TextStyle(
+                              fontSize: height * 0.023,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          print("val: $val");
+                          if (_currentUser != null &&
+                              _currentUser.cars != null) {
+                            var cars = json.decode(_currentUser.cars);
+
+                            print("cars: $cars");
+
+                            if (cars.length > 0) {
+                              var findCar = cars.firstWhere(
+                                  (car) =>
+                                      car["id"].toString() == val.toString(),
+                                  orElse: () => null);
+                              if (findCar != null) {
+                                print("findCar: $findCar");
+                                _currentCar = findCar;
+                              }
+                            }
+                          }
+                        });
+                      },
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -233,14 +300,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "ALTANKHUYAG ",
+                    (_currentUser != null && _currentUser.lastname != null)
+                        ? _currentUser.lastname.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextGrey,
                       fontWeight: FontWeight.w300,
                     ),
                   ),
                   Text(
-                    " BAYARBILEG",
+                    (_currentUser != null && _currentUser.firstname != null)
+                        ? _currentUser.firstname.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextDark,
                       fontWeight: FontWeight.bold,
@@ -261,7 +332,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(width: width * 0.02),
                   Text(
-                    "9911-5053",
+                    (_currentUser != null && _currentUser.phone != null)
+                        ? _currentUser.phone.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextGrey,
                       fontSize: height * 0.016,
@@ -282,28 +355,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "  Аралын дугаар",
-                    style: TextStyle(
-                      color: kTextGrey,
-                      fontSize: height * 0.018,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    "YKP39  ",
-                    style: TextStyle(
-                      color: kTextDark,
-                      fontSize: height * 0.022,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
               Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -521,7 +572,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, "/add_part");
+                        Navigator.pushNamed(context, "/add_part",
+                            arguments: _currentCar["id"]);
                       },
                       splashColor: kTextGrey,
                       child: Container(

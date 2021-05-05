@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^5.7.10
   flutter_launcher_icons: ^0.8.1
   flutter_swiper: ^1.1.6
+  slide_popup_dialog: ^0.0.2
   
 dev_dependencies:
   flutter_test:

@@ -76,32 +76,6 @@ class _AddCarState extends State<AddCar> {
 
   Widget _info(double height, double width) => Column(
         children: <Widget>[
-          // Padding(
-          //   padding: EdgeInsets.only(
-          //     top: height * 0.016,
-          //   ),
-          //   child: InkWell(
-          //     onTap: () {
-          //       getImage();
-          //     },
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: [
-          //         Text(
-          //           "Зураг оруулах",
-          //           style: TextStyle(
-          //             color: kTextGrey,
-          //             fontWeight: FontWeight.bold,
-          //           ),
-          //         ),
-          //         Icon(
-          //           Icons.add,
-          //           color: kTextGrey,
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
           Container(
             padding: EdgeInsets.all(20.0),
             child: Form(
@@ -110,14 +84,6 @@ class _AddCarState extends State<AddCar> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // ClipRRect(
-                  //   borderRadius: BorderRadius.circular(35),
-                  //   child: Image.asset(
-                  //     "assets/images/child.png",
-                  //     width: 70,
-                  //   ),
-                  // ),
-                  // SizedBox(height: 30),
                   DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
