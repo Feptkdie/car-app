@@ -2,17 +2,19 @@ class Company {
   int id;
   String name;
   String logo;
-  String address;
+  String phone;
   String coordX;
   String coordY;
+  String jsonData;
 
   Company({
     this.id,
     this.name,
     this.logo,
-    this.address,
+    this.phone,
     this.coordX,
     this.coordY,
+    this.jsonData,
   });
 
   factory Company.fromJson(Map<String, dynamic> json) {
@@ -20,9 +22,10 @@ class Company {
       id: json["id"],
       name: json["name"],
       logo: json["logo"],
-      address: json["address"],
+      phone: json["phone"],
       coordX: json["coordX"],
       coordY: json["coordY"],
+      jsonData: json["jsonData"],
     );
   }
 }

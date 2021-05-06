@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carpro_app/models/company.dart';
@@ -105,20 +106,16 @@ class _MapPageState extends State<MapPage> {
         elevation: 1.0,
         backgroundColor: kBackColor2,
         leading: Padding(
-          padding: const EdgeInsets.all(
-            6.0,
-          ),
+          padding: const EdgeInsets.all(5.0),
           child: GestureDetector(
             onTap: () {
               Navigator.of(context).pop(context);
             },
             child: Padding(
               padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.height * 0.01,
+                left: 10.0,
               ),
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.045,
-                width: MediaQuery.of(context).size.height * 0.045,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
@@ -144,10 +141,11 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
         title: Text(
-          "Map",
+          "Байршил",
           style: TextStyle(
             color: kTextGrey,
             fontWeight: FontWeight.bold,
+            fontSize: 16.0,
           ),
         ),
         actions: [
@@ -157,86 +155,81 @@ class _MapPageState extends State<MapPage> {
                 Icons.location_pin,
                 color: kTextGrey,
               ),
+              SizedBox(width: 10.0),
               Container(
-                width: 200.0,
+                width: 180.0,
                 child: DropdownButtonHideUnderline(
-                  child: ButtonTheme(
-                    alignedDropdown: true,
-                    child: DropdownButton<int>(
-                      hint: Text("Ангилал сонгох"),
-                      value: _selectedCategoryId,
-                      iconSize: 24,
-                      elevation: 16,
-                      style: TextStyle(color: Colors.black),
-                      items:
-                          _companyCategories.map<DropdownMenuItem<int>>((map) {
-                        return DropdownMenuItem<int>(
-                          value: map.id,
-                          child: Container(
-                            width: 150.0,
-                            child: Text(
-                              map.name,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: kTextDark,
-                                fontWeight: FontWeight.bold,
+                  child: DropdownButton<int>(
+                    isExpanded: true,
+                    hint: Text("Ангилал сонгох"),
+                    value: _selectedCategoryId,
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.black),
+                    items: _companyCategories.map<DropdownMenuItem<int>>((map) {
+                      return DropdownMenuItem<int>(
+                        value: map.id,
+                        child: Text(
+                          map.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: kTextDark,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (int value) {
+                      print("onChanged: $value");
+                      setState(() {
+                        _currentMarkers = [];
+                        _selectedCategoryId = value;
+                        _currentCompanyCategory = _companyCategories.firstWhere(
+                            (category) => category.id == value,
+                            orElse: () => null);
+
+                        if (_currentCompanyCategory != null) {
+                          _currentCompanyCategory.companies.forEach(
+                            (Company company) {
+                              _currentMarkers.add(
+                                Marker(
+                                  infoWindow: InfoWindow(
+                                    title: company.name,
+                                    snippet: "дэлгэрэнгүй харах",
+                                    onTap: () {
+                                      showSlideDialogInfo(context, company);
+                                    },
+                                  ),
+                                  markerId: MarkerId(company.name),
+                                  position: LatLng(
+                                    double.parse(company.coordX),
+                                    double.parse(company.coordY),
+                                  ),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      120),
+                                ),
+                              );
+                            },
+                          );
+
+                          var moveToPosition = LatLng(47.9193279, 106.9178054);
+                          if (_currentMarkers.length > 0) {
+                            moveToPosition = _currentMarkers[0].position;
+                          }
+
+                          _googleMapController.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              new CameraPosition(
+                                target: moveToPosition,
+                                tilt: 0,
+                                zoom: 12.4,
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (int value) {
-                        print("onChanged: $value");
-                        setState(() {
-                          _currentMarkers = [];
-                          _selectedCategoryId = value;
-                          _currentCompanyCategory = _companyCategories
-                              .firstWhere((category) => category.id == value,
-                                  orElse: () => null);
-
-                          if (_currentCompanyCategory != null) {
-                            _currentCompanyCategory.companies.forEach(
-                              (Company company) {
-                                _currentMarkers.add(
-                                  Marker(
-                                    infoWindow: InfoWindow(
-                                      title: company.name,
-                                      snippet: "дэлгэрэнгүй харах",
-                                      onTap: () {
-                                        showSlideDialogInfo(context, company);
-                                      },
-                                    ),
-                                    markerId: MarkerId(company.name),
-                                    position: LatLng(
-                                      double.parse(company.coordX),
-                                      double.parse(company.coordY),
-                                    ),
-                                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                                        120),
-                                  ),
-                                );
-                              },
-                            );
-
-                            var moveToPosition =
-                                LatLng(47.9193279, 106.9178054);
-                            if (_currentMarkers.length > 0) {
-                              moveToPosition = _currentMarkers[0].position;
-                            }
-
-                            _googleMapController.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                new CameraPosition(
-                                  target: moveToPosition,
-                                  tilt: 0,
-                                  zoom: 12.4,
-                                ),
-                              ),
-                            );
-                          }
-                        });
-                      },
-                    ),
+                          );
+                        }
+                      });
+                    },
                   ),
                 ),
               ),
@@ -298,88 +291,96 @@ class _MapPageState extends State<MapPage> {
   void showSlideDialogInfo(BuildContext context, Company company) {
     slideDialog.showSlideDialog(
       context: context,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            company.name,
-            style: TextStyle(
-              color: kTextDark,
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 20.0),
-          if (company.logo != null)
-            Image(
-              image: CachedNetworkImageProvider(company.logo),
-            ),
-          SizedBox(height: 20.0),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(),
-                Column(
-                  children: [
-                    Text(
-                      "Ажилдаг өдөр",
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                    Text("1,2,3,4,6"),
-                  ],
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                company.name,
+                style: TextStyle(
+                  color: kTextDark,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
                 ),
-                SizedBox(),
-                Column(
-                  children: [
-                    Text(
-                      "Нээх / Хаах",
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 12.0,
-                      ),
-                    ),
-                    Text("09:30-19:30"),
-                  ],
+              ),
+              SizedBox(height: 20.0),
+              if (company.logo != null)
+                CachedNetworkImage(
+                  imageUrl: company.logo,
+                  placeholder: (context, url) =>
+                      CircularProgressIndicator(strokeWidth: 2.0),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
-                SizedBox(),
-              ],
-            ),
-          ),
-          SizedBox(),
-          Text(
-            "+97699110713",
-            style: TextStyle(),
-          ),
-          SizedBox(),
-          FlatButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            color: kPrimaryColor.withOpacity(1),
-            padding: EdgeInsets.only(left: 5, right: 5),
-            onPressed: () {
-              _launchURL("+97699110713");
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Залгах".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              if (!["", " ", null, false, 0].contains(company.jsonData))
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: json.decode(company.jsonData).length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      height: 36,
+                      padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                      color: Colors.white,
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                            width: 120.0,
+                            child: Text(
+                                json.decode(company.jsonData)[index]["label"]),
+                          ),
+                          SizedBox(width: 20.0),
+                          Expanded(
+                            child: Container(
+                              child: Text(
+                                json.decode(company.jsonData)[index]["value"],
+                                style: TextStyle(),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              SizedBox(height: 20.0),
+              if (!["", " ", null, false, 0].contains(company.phone))
+                Text("Утас: ${company.phone}"),
+              if (!["", " ", null, false, 0].contains(company.phone))
+                FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  color: kPrimaryColor.withOpacity(1),
+                  padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                  onPressed: () {
+                    _launchURL("${company.phone}");
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.phone,
+                        size: 18.0,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 5.0),
+                      Text(
+                        "Залгах".toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              SizedBox(height: 10.0),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:carpro_app/models/car.dart';
 import 'package:carpro_app/models/company.dart';
 import 'package:carpro_app/models/company_category.dart';
+import 'package:carpro_app/models/setting.dart';
 import 'package:carpro_app/models/sos.dart';
 import 'package:carpro_app/providers/company_category_provider.dart';
+import 'package:carpro_app/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carpro_app/models/sos_category.dart';
 import 'package:carpro_app/providers/sos_category_provider.dart';
@@ -39,6 +41,23 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   AnimationController animationController;
+
+  void setSettingsProvider(List<dynamic> list) {
+    List<Setting> settings = [];
+
+    list.forEach((data) {
+      var item = {
+        "id": data["id"],
+        "phone": data["phone"],
+        "about": data["about"],
+      };
+
+      Setting setting = Setting.fromJson(item);
+      settings.add(setting);
+    });
+
+    context.read<SettingProvider>().setSettings(settings);
+  }
 
   void setCarProvider(List<dynamic> list) {
     List<Car> cars = [];
@@ -119,9 +138,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           "id": item["id"],
           "name": item["name"],
           "logo": item["logo"],
-          "address": item["address"],
+          "phone": item["phone"],
           "coordX": item["coordX"],
           "coordY": item["coordY"],
+          "jsonData": item["jsonData"],
         };
 
         Company company = Company.fromJson(companyItem);
@@ -151,6 +171,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     animationController.repeat();
 
     fetchData().then((data) {
+      setSettingsProvider(data["settings"]);
       setCarProvider(data["cars"]);
       setSosCategoryProvider(data["sos_categories"]);
       setCompanyCategoryProvider(data["company_categories"]);

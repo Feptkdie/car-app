@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   _top(height),
-                  if (_currentCar != null) _info(height, width),
+                  _info(height, width),
                 ],
               ),
             ),
@@ -440,184 +440,194 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.032,
-            right: width * 0.04,
-            left: width * 0.04,
+        if (_currentCar != null && _currentCar["parts"] != null)
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: _currentCar["parts"].length,
+            itemBuilder: (context, index) {
+              return _part(_currentCar["parts"][index]);
+            },
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    height * 0.01,
+        if (_currentCar != null)
+          Padding(
+            padding: EdgeInsets.only(
+              top: height * 0.022,
+              right: width * 0.04,
+              left: width * 0.04,
+              bottom: height * 0.022,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 4,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
                   ),
-                  child: Material(
-                    color: Colors.white.withOpacity(0.9),
-                    child: InkWell(
-                      splashColor: kTextGrey,
-                      onTap: () {
-                        Navigator.pushNamed(context, "/edit_part");
-                      },
-                      child: Container(
-                        height: height * 0.07,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.4,
-                            color: Colors.grey,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                      height * 0.01,
+                    ),
+                    child: Material(
+                      color: Colors.white.withOpacity(
+                        0.9,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, "/add_part",
+                              arguments: _currentCar["id"]);
+                        },
+                        splashColor: kTextGrey,
+                        child: Container(
+                          height: height * 0.07,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1.4,
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              height * 0.01,
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(
-                            height * 0.01,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: height * 0.022,
+                              right: height * 0.01,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Эд анги нэмэх",
+                                  style: TextStyle(
+                                    fontSize: height * 0.018,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.add,
+                                  color: kGreyColor,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: height * 0.01,
-                            right: height * 0.01,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _part(dynamic part) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 15.0,
+        right: 15.0,
+        left: 15.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Material(
+                color: Colors.white.withOpacity(0.9),
+                child: InkWell(
+                  splashColor: kTextGrey,
+                  onTap: () {
+                    Navigator.pushNamed(context, "/edit_part");
+                  },
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1.4,
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        10.0,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 10.0,
+                        right: 10.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              Row(
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: 10.0,
+                                ),
+                                child: Image.asset(
+                                  "assets/images/engine_oil.png",
+                                  color: kTextGrey,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: height * 0.008,
-                                    ),
-                                    child: Image.asset(
-                                      "assets/images/engine_oil.png",
-                                      color: kTextGrey,
+                                  Text(
+                                    part["name"].toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.0,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: height * 0.01,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Авто тосол",
-                                        style: TextStyle(
-                                          fontSize: height * 0.018,
-                                        ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      part["purchased_at"],
+                                      style: TextStyle(
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.w300,
                                       ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          "Feb 6, 2021      ",
-                                          style: TextStyle(
-                                            fontSize: height * 0.014,
-                                            fontWeight: FontWeight.w300,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ],
                               ),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                color: kGreyColor,
-                              ),
                             ],
                           ),
-                        ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: kGreyColor,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.022,
-            right: width * 0.04,
-            left: width * 0.04,
-            bottom: height * 0.022,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    height * 0.01,
-                  ),
-                  child: Material(
-                    color: Colors.white.withOpacity(
-                      0.9,
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, "/add_part",
-                            arguments: _currentCar["id"]);
-                      },
-                      splashColor: kTextGrey,
-                      child: Container(
-                        height: height * 0.07,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.4,
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            height * 0.01,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: height * 0.022,
-                            right: height * 0.01,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Эд анги нэмэх",
-                                style: TextStyle(
-                                  fontSize: height * 0.018,
-                                ),
-                              ),
-                              Icon(
-                                Icons.add,
-                                color: kGreyColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

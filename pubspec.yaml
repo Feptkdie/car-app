@@ -44,6 +44,7 @@ dependencies:
   flutter_launcher_icons: ^0.8.1
   flutter_swiper: ^1.1.6
   slide_popup_dialog: ^0.0.2
+  progress_indicator_button: ^0.0.3
   
 dev_dependencies:
   flutter_test:

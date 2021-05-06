@@ -202,8 +202,7 @@ class _AddCarState extends State<AddCar> {
                               if (result["success"]) {
                                 UserPreferences()
                                     .saveUserCars(json.encode(result["data"]));
-                                Navigator.popAndPushNamed(
-                                    context, "/profile_car_edit");
+                                Navigator.popAndPushNamed(context, "/profile");
                               }
                             } else {
                               if (response.statusCode == 401) {
@@ -269,69 +268,36 @@ class _AddCarState extends State<AddCar> {
                           onTap: () {
                             Navigator.of(context).pop(context);
                           },
-                          child: Theme.of(context).platform ==
-                                  TargetPlatform.iOS
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                    ),
-                                    child: CupertinoButton(
-                                      color: Colors.transparent,
-                                      child: Icon(
-                                        Icons.arrow_back_ios,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black87,
-                                          blurRadius: 7,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.height * 0.01,
+                            ),
+                            child: Container(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.045,
+                              width: MediaQuery.of(context).size.height * 0.045,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.red[500],
+                                    Colors.red[900],
+                                  ],
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black87,
+                                    blurRadius: 7,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(

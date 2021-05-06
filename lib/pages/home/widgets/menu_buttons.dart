@@ -112,7 +112,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                     width: widget.width * 0.3,
                     height: widget.height * 0.08,
                     child: Text(
-                      "Газрын\nзураг",
+                      "Байршил",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: kTextGrey,
@@ -134,7 +134,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Газрын\nзураг",
+                          "Байршил",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: kTextGrey,
@@ -452,7 +452,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        "Хувийн\nтохиргоо",
+                        "Бүртгэл",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: kTextGrey,
