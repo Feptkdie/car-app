@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:carpro_app/models/car.dart';
 import 'package:carpro_app/models/company.dart';
 import 'package:carpro_app/models/company_category.dart';
+import 'package:carpro_app/models/info.dart';
 import 'package:carpro_app/models/setting.dart';
 import 'package:carpro_app/models/sos.dart';
 import 'package:carpro_app/providers/company_category_provider.dart';
+import 'package:carpro_app/providers/info_provider.dart';
 import 'package:carpro_app/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carpro_app/models/sos_category.dart';
@@ -50,6 +52,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         "id": data["id"],
         "phone": data["phone"],
         "about": data["about"],
+        "sliders": data["sliders"],
       };
 
       Setting setting = Setting.fromJson(item);
@@ -91,6 +94,27 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     });
 
     context.read<CarProvider>().setCars(cars);
+  }
+
+  void setInfoProvider(List<dynamic> list) {
+    List<Info> infos = [];
+
+    list.forEach((data) {
+      var item = {
+        "id": data["id"],
+        "title": data["title"],
+        "subtitle": data["subtitle"],
+        "fileMode": data["fileMode"],
+        "filePath": data["filePath"],
+        "content": data["content"],
+        "createdAt": data["createdAt"],
+      };
+
+      Info info = Info.fromJson(item);
+      infos.add(info);
+    });
+
+    context.read<InfoProvider>().setInfos(infos);
   }
 
   void setSosCategoryProvider(List<dynamic> list) {
@@ -173,6 +197,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     fetchData().then((data) {
       setSettingsProvider(data["settings"]);
       setCarProvider(data["cars"]);
+      setInfoProvider(data["infos"]);
       setSosCategoryProvider(data["sos_categories"]);
       setCompanyCategoryProvider(data["company_categories"]);
 

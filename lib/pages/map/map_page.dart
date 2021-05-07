@@ -155,9 +155,9 @@ class _MapPageState extends State<MapPage> {
                 Icons.location_pin,
                 color: kTextGrey,
               ),
-              SizedBox(width: 10.0),
+              SizedBox(width: 5.0),
               Container(
-                width: 180.0,
+                width: 150.0,
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<int>(
                     isExpanded: true,
@@ -292,94 +292,117 @@ class _MapPageState extends State<MapPage> {
     slideDialog.showSlideDialog(
       context: context,
       child: Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                company.name,
-                style: TextStyle(
-                  color: kTextDark,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
+        child: Column(
+          children: [
+            Text(
+              company.name,
+              style: TextStyle(
+                color: kTextDark,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
               ),
-              SizedBox(height: 20.0),
-              if (company.logo != null)
-                CachedNetworkImage(
-                  imageUrl: company.logo,
-                  placeholder: (context, url) =>
-                      CircularProgressIndicator(strokeWidth: 2.0),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
-              if (!["", " ", null, false, 0].contains(company.jsonData))
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: json.decode(company.jsonData).length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: 36,
-                      padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                      color: Colors.white,
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: 120.0,
-                            child: Text(
-                                json.decode(company.jsonData)[index]["label"]),
-                          ),
-                          SizedBox(width: 20.0),
-                          Expanded(
-                            child: Container(
-                              child: Text(
-                                json.decode(company.jsonData)[index]["value"],
-                                style: TextStyle(),
-                                textAlign: TextAlign.right,
+            ),
+            SizedBox(height: 20.0),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (company.logo != null)
+                      CachedNetworkImage(
+                        imageUrl: company.logo,
+                        placeholder: (context, url) =>
+                            CircularProgressIndicator(strokeWidth: 2.0),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                    if (!["", " ", null, false, 0].contains(company.jsonData))
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: json.decode(company.jsonData).length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            // height: 36,
+                            padding: EdgeInsets.only(
+                                left: 20.0, right: 20.0, bottom: 10.0),
+                            color: Colors.white,
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: <Widget>[
+                                    Container(
+                                      width: 120.0,
+                                      child: Text(
+                                        json.decode(company.jsonData)[index]
+                                            ["label"],
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                          color:
+                                              Colors.black87.withOpacity(0.5),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 20.0),
+                                    Expanded(
+                                      child: Container(
+                                        child: Text(
+                                          json.decode(company.jsonData)[index]
+                                              ["value"],
+                                          style: TextStyle(fontSize: 13.0),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10.0),
+                                if (index <
+                                    json.decode(company.jsonData).length - 1)
+                                  Divider(),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    SizedBox(height: 20.0),
+                    if (!["", " ", null, false, 0].contains(company.phone))
+                      Text("Утас: ${company.phone}"),
+                    if (!["", " ", null, false, 0].contains(company.phone))
+                      FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        color: kPrimaryColor.withOpacity(1),
+                        padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        onPressed: () {
+                          _launchURL("${company.phone}");
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.phone,
+                              size: 18.0,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 5.0),
+                            Text(
+                              "Залгах".toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              SizedBox(height: 20.0),
-              if (!["", " ", null, false, 0].contains(company.phone))
-                Text("Утас: ${company.phone}"),
-              if (!["", " ", null, false, 0].contains(company.phone))
-                FlatButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  color: kPrimaryColor.withOpacity(1),
-                  padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                  onPressed: () {
-                    _launchURL("${company.phone}");
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.phone,
-                        size: 18.0,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 5.0),
-                      Text(
-                        "Залгах".toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    SizedBox(height: 10.0),
+                  ],
                 ),
-              SizedBox(height: 10.0),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

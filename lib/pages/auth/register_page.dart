@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:carpro_app/widgets/custom_app_bar.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,8 +44,10 @@ class _RegisterPageState extends State<RegisterPage> {
     AuthProvider auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Бүртгүүлэх"),
+      backgroundColor: kBackColor2,
+      appBar: CustomAppBar(
+        height: 56.0,
+        title: "Бүртгүүлэх",
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -259,7 +262,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 80),
+                          SizedBox(height: 25),
                           SizedBox(
                             width: 250,
                             height: 40,

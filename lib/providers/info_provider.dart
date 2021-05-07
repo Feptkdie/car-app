@@ -5,7 +5,7 @@ class InfoProvider with ChangeNotifier {
   List<Info> _infos = new List<Info>();
   List<Info> get getInfos => _infos;
 
-  void setSoss(List<Info> list) {
+  void setInfos(List<Info> list) {
     _infos = list;
 
     notifyListeners();
