@@ -15,11 +15,6 @@ class SosPage extends StatefulWidget {
 
 class _SosPageState extends State<SosPage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackColor2,
