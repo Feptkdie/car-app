@@ -93,7 +93,7 @@ class _EditPartState extends State<EditPart> {
                 TextField(
                   decoration: InputDecoration(
                     isDense: true,
-                    labelText: "Эд ангийн нэр",
+                    labelText: "Үйлчилгээний нэр",
                     labelStyle: TextStyle(
                       color: Colors.grey,
                     ),
@@ -106,7 +106,7 @@ class _EditPartState extends State<EditPart> {
                 TextField(
                   decoration: InputDecoration(
                     isDense: true,
-                    labelText: "Авсан он сар",
+                    labelText: "Эхлэх он сар",
                     labelStyle: TextStyle(
                       color: Colors.grey,
                     ),
@@ -173,76 +173,43 @@ class _EditPartState extends State<EditPart> {
                           onTap: () {
                             Navigator.of(context).pop(context);
                           },
-                          child: Theme.of(context).platform ==
-                                  TargetPlatform.iOS
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                    ),
-                                    child: CupertinoButton(
-                                      color: Colors.transparent,
-                                      child: Icon(
-                                        Icons.arrow_back_ios,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black87,
-                                          blurRadius: 7,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.height * 0.01,
+                            ),
+                            child: Container(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.045,
+                              width: MediaQuery.of(context).size.height * 0.045,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.red[500],
+                                    Colors.red[900],
+                                  ],
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black87,
+                                    blurRadius: 7,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(
                         width: 8.0,
                       ),
                       Text(
-                        "Эд анги засах",
+                        "Үйлчилгээ засах",
                         style: TextStyle(
                           color: kTextGrey,
                           fontWeight: FontWeight.bold,

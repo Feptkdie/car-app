@@ -1,25 +1,29 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carpro_app/models/info.dart';
+import 'package:carpro_app/providers/info_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '../../constants.dart';
-import 'info_page.dart';
 
-class NewsDetailScreen extends StatefulWidget {
-  final int index;
+class InfoDetail extends StatefulWidget {
+  static String routeName = "/info_detail";
 
-  const NewsDetailScreen({Key key, this.index}) : super(key: key);
   @override
-  _NewsDetailScreenState createState() => _NewsDetailScreenState();
+  _InfoDetailState createState() => _InfoDetailState();
 }
 
-class _NewsDetailScreenState extends State<NewsDetailScreen> {
+class _InfoDetailState extends State<InfoDetail> {
   DateTime now = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
+    final routes =
+        ModalRoute.of(context).settings.arguments as Map<String, int>;
+    var infos = context.read<InfoProvider>().getInfos;
     DateTime now = DateTime.now();
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Color(0xffd0d3d5),
       appBar: AppBar(
@@ -32,62 +36,35 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
             onTap: () {
               Navigator.of(context).pop(context);
             },
-            child: Theme.of(context).platform == TargetPlatform.iOS
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                      ),
-                      child: CupertinoButton(
-                        color: Colors.transparent,
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black87,
-                            blurRadius: 7,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
-                    ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.height * 0.01,
+              ),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.045,
+                width: MediaQuery.of(context).size.height * 0.045,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.red[500],
+                      Colors.red[900],
+                    ],
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black87,
+                      blurRadius: 7,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ),
         title: Text(
@@ -100,13 +77,13 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          child: _cardWidget(context, now),
+          child: _cardWidget(context, now, infos[routes['index']]),
         ),
       ),
     );
   }
 
-  Widget _cardWidget(BuildContext context, DateTime now) {
+  Widget _cardWidget(BuildContext context, DateTime now, Info info) {
     return LayoutBuilder(
         builder: (BuildContext ctx, BoxConstraints constraints) {
       return Container(
@@ -146,9 +123,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                                       Padding(
                                         padding: EdgeInsets.only(left: 5.0),
                                         child: Text(
-                                          InfoData
-                                              .infoItems[widget.index].createdAt
-                                              .substring(0, 10),
+                                          info.createdAt.substring(0, 10),
                                           style: TextStyle(
                                               fontFamily: "Montserrat",
                                               fontSize: MediaQuery.of(context)
@@ -185,7 +160,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                               children: [
                                 Flexible(
                                   child: Text(
-                                    InfoData.infoItems[widget.index].title,
+                                    info.title,
                                     style: TextStyle(
                                       fontFamily: "Montserrat",
                                       fontSize:
@@ -210,7 +185,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                             width: double.infinity,
                             alignment: Alignment.center,
                             child: HtmlWidget(
-                              InfoData.infoItems[widget.index].content,
+                              info.content,
                             ),
                             // child: Html(
                             //   data: InfoData.infoItems[widget.index].content,
@@ -236,37 +211,79 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height,
-                        maxWidth: MediaQuery.of(context).size.width,
-                      ),
-                      child: Container(
-                        margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.04,
-                          right: MediaQuery.of(context).size.height * 0.04,
-                          left: MediaQuery.of(context).size.height * 0.04,
+                  if (info.fileMode == "image")
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height,
+                          maxWidth: MediaQuery.of(context).size.width,
                         ),
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        width: MediaQuery.of(context).size.width,
-                        // decoration: BoxDecoration(
-                        //   color: Colors.white,
-                        //   borderRadius: BorderRadius.circular(10),
-                        // ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image(
-                            image: NetworkImage(
-                              InfoData.infoItems[widget.index].filePath,
+                        child: Container(
+                          margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.04,
+                            right: MediaQuery.of(context).size.height * 0.04,
+                            left: MediaQuery.of(context).size.height * 0.04,
+                          ),
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          width: MediaQuery.of(context).size.width,
+                          // decoration: BoxDecoration(
+                          //   color: Colors.white,
+                          //   borderRadius: BorderRadius.circular(10),
+                          // ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image(
+                              image: NetworkImage(
+                                info.filePath,
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  if (info.fileMode == "video")
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height,
+                          maxWidth: MediaQuery.of(context).size.width,
+                        ),
+                        child: Container(
+                          margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.04,
+                            right: MediaQuery.of(context).size.height * 0.04,
+                            left: MediaQuery.of(context).size.height * 0.04,
+                          ),
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          width: MediaQuery.of(context).size.width,
+                          // decoration: BoxDecoration(
+                          //   color: Colors.white,
+                          //   borderRadius: BorderRadius.circular(10),
+                          // ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: CachedNetworkImage(
+                              imageUrl:
+                                  "http://i3.ytimg.com/vi/${info.filePath}/0.jpg",
+                              height: 150.0,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => SizedBox(
+                                width: 30.0,
+                                height: 30.0,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 1.5),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -274,5 +291,76 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
         ),
       );
     });
+  }
+
+  Widget _infoItem(Info info) {
+    return Stack(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (info.fileMode == "image")
+                CachedNetworkImage(
+                  imageUrl: info.filePath,
+                  height: 180.0,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      CircularProgressIndicator(strokeWidth: 1.5),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              if (info.fileMode == "video")
+                CachedNetworkImage(
+                  imageUrl: "http://i3.ytimg.com/vi/${info.filePath}/0.jpg",
+                  height: 150.0,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => SizedBox(
+                    width: 30.0,
+                    height: 30.0,
+                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                ),
+                child: Text(
+                  info.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.0,
+                  ),
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  Image.asset(
+                    "assets/images/clock.png",
+                    width: 12.0,
+                  ),
+                  SizedBox(width: 10.0),
+                  Text(
+                    info.createdAt.substring(0, 10),
+                    style: TextStyle(fontSize: 11.0),
+                  ),
+                ],
+              ),
+              Divider(),
+            ],
+          ),
+        ),
+        if (info.fileMode == "video")
+          Positioned(
+            top: 10.0,
+            right: 30.0,
+            child: Image.asset("assets/images/youtube.png", width: 30.0),
+          ),
+      ],
+    );
   }
 }

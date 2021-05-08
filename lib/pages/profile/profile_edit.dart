@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:carpro_app/helpers/app_url.dart';
+import 'package:carpro_app/helpers/user_preferences.dart';
+import 'package:carpro_app/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import '../../constants.dart';
 
 class ProfileEdit extends StatefulWidget {
@@ -11,35 +18,66 @@ class ProfileEdit extends StatefulWidget {
 }
 
 class _ProfileEditState extends State<ProfileEdit> {
-  final firstNameTEC = new TextEditingController();
-  final lastNameTEC = new TextEditingController();
-  final phoneTEC = new TextEditingController();
-  final islandTEC = new TextEditingController();
-  final firstDateTEC = new TextEditingController();
-  final lastDateTEC = new TextEditingController();
-  final colorTEC = new TextEditingController();
-  final carNameTEC = new TextEditingController();
-  final carMarkTEC = new TextEditingController();
-  final carNumberTEC = new TextEditingController();
+  Future<User> _userPrefs;
+  final formKey = new GlobalKey<FormState>();
 
-  String _currentCategory = "Машин 1";
-  bool _isLoad = true;
+  TextEditingController _lastNameController;
+  TextEditingController _firstNameController;
+  TextEditingController _phoneController;
+
+  String _currentAvatar;
+
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImageCamera() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future getImageGallery() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  void fetchData() {
+    _userPrefs = UserPreferences().getUser();
+
+    _lastNameController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _phoneController = TextEditingController();
+
+    _userPrefs.then((User user) {
+      print("user: ${user.avatar}");
+
+      _currentAvatar =
+          (user.avatar == null || user.avatar == "") ? null : user.avatar;
+      _lastNameController.text = user.lastname;
+      _firstNameController.text = user.firstname;
+      _phoneController.text = user.phone;
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
   @override
   void initState() {
-    firstNameTEC.text = "Altankhuyag";
-    lastNameTEC.text = "Bayarbileg";
-    phoneTEC.text = "99115053";
-    islandTEC.text = "YKP39";
-    firstDateTEC.text = "2011";
-    lastDateTEC.text = "2015";
-    colorTEC.text = "Цагаан";
-    carNameTEC.text = "PRIUS 30";
-    carMarkTEC.text = "TOYOTA";
-    carNumberTEC.text = "УБА 2424";
-    setState(() {
-      _isLoad = false;
-    });
     super.initState();
+    fetchData();
   }
 
   @override
@@ -66,26 +104,31 @@ class _ProfileEditState extends State<ProfileEdit> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 _top(height),
-                if (_isLoad)
-                  Container(
-                    height: height - height * 0.25,
-                    width: double.infinity,
-                    child: Center(
-                      child: Container(
-                        height: 15.0,
-                        width: 15.0,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.8,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                if (!_isLoad) _info(height, width),
+                FutureBuilder<User>(
+                  future: _userPrefs,
+                  builder:
+                      (BuildContext context, AsyncSnapshot<User> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: Text("Уншиж байна ..."),
+                        );
+                      default:
+                        if (snapshot.hasError) {
+                          // return Text("Error: ${snapshot.error}");
+                          return Center(child: Text("Нэвтрэх"));
+                        } else {
+                          if (["", null, " ", false, 0]
+                                  .contains(snapshot.data.token) &&
+                              snapshot.data != null) {
+                            return Center(child: Text("Нэвтрэх"));
+                          } else {
+                            return _info(height, width);
+                          }
+                        }
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -94,132 +137,217 @@ class _ProfileEditState extends State<ProfileEdit> {
     );
   }
 
-  Widget _info(double height, double width) {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: height * 0.016,
+  Widget _info(double height, double width) => Column(
+        children: <Widget>[
+          _image == null
+              ? _currentAvatar != null
+                  ? Image.network(
+                      _currentAvatar,
+                      height: 100.0,
+                      fit: BoxFit.cover,
+                    )
+                  : Text('Зураг')
+              : Image.file(
+                  _image,
+                  height: 100.0,
+                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 8.0,
+              ),
+              Container(
+                width: 100.0,
+                child: FlatButton(
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: Colors.redAccent,
                   ),
-                  child: InkWell(
-                    onTap: () {
-                      print("profile!");
-                    },
-                    child: Text(
-                      "Profile",
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontWeight: FontWeight.bold,
+                  onPressed: this.getImageCamera,
+                  color: Colors.white,
+                ),
+                margin: EdgeInsets.only(top: 20.0),
+              ),
+              SizedBox(
+                width: 8.0,
+              ),
+              Container(
+                width: 100.0,
+                child: FlatButton(
+                  child: Icon(
+                    Icons.image,
+                    color: Colors.redAccent,
+                  ),
+                  onPressed: this.getImageGallery,
+                  color: Colors.white,
+                ),
+                margin: EdgeInsets.only(top: 20.0),
+              ),
+              SizedBox(
+                width: 8.0,
+              ),
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.all(20.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _lastNameController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Овог оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Овог',
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: height * 0.01,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      height * 0.2,
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _firstNameController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Нэрээ оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Нэр',
+                      ),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        splashColor: Colors.black,
-                        onTap: () {
-                          //
-                        },
-                        child: Image.asset(
-                          "assets/images/me.jpg",
-                          fit: BoxFit.cover,
-                          height: height * 0.14,
-                          width: height * 0.14,
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _phoneController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Утас дугаар оруулна уу!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Утас',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.0),
+                  SizedBox(
+                    width: 100.0,
+                    height: 40,
+                    child: FlatButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      color: kTextGrey,
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String token = prefs.getString("token") ?? null;
+
+                        if (token != null) {
+                          final form = formKey.currentState;
+
+                          if (form.validate()) {
+                            String avatarImage;
+                            String avatarName;
+
+                            if (_image != null) {
+                              List<int> imageBytes = _image.readAsBytesSync();
+                              avatarImage = base64Encode(imageBytes);
+                              avatarName = _image.path.split("/").last;
+                            }
+
+                            final Map<String, dynamic> formData = {
+                              "lastname": _lastNameController.text,
+                              "firstname": _firstNameController.text,
+                              "phone": _phoneController.text,
+                              "avatar": avatarImage,
+                              "avatar_name": avatarName,
+                            };
+
+                            print("formdata: $formData");
+
+                            var response = await http.post(
+                              AppUrl.baseURL + "/update-user",
+                              headers: {
+                                "Authorization": "Bearer $token",
+                                "Content-Type": "application/json",
+                                "Accept": "application/json",
+                              },
+                              body: json.encode(formData),
+                            );
+
+                            // print(response.body);
+
+                            if (response.statusCode == 200) {
+                              var result =
+                                  json.decode(utf8.decode(response.bodyBytes));
+
+                              if (result["success"]) {
+                                var user = {
+                                  // "email": body["user"]["email"],
+                                  "lastname": result["user"]["lastname"],
+                                  "firstname": result["user"]["firstname"],
+                                  "phone": result["user"]["phone"],
+                                  "avatar": result["user"]["avatar"],
+                                };
+
+                                User authUser = User.fromJson(user);
+
+                                UserPreferences().updateUser(authUser);
+                                Navigator.popAndPushNamed(context, "/profile");
+                              }
+                            } else {
+                              if (response.statusCode == 401) {
+                                UserPreferences().removeUser();
+                                Navigator.pushNamed(context, "/login");
+                              } else {
+                                Navigator.popAndPushNamed(context, "/profile");
+                              }
+                            }
+                          }
+                        } else {
+                          UserPreferences().removeUser();
+                          Navigator.pushNamed(context, "/login");
+                        }
+                      },
+                      child: Text(
+                        "Хадгалах",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
                         ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: height * 0.016,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      //
-                    },
-                    child: Text(
-                      "Зураг оруулах",
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.04,
-            left: width * 0.06,
-            right: width * 0.06,
-            bottom: height * 0.02,
           ),
-          child: Column(
-            children: <Widget>[
-              TextField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Овог",
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-                controller: firstNameTEC,
-              ),
-              SizedBox(
-                height: height * 0.012,
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Нэр",
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-                controller: lastNameTEC,
-              ),
-              SizedBox(
-                height: height * 0.012,
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: "Утас",
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-                keyboardType: TextInputType.phone,
-                controller: phoneTEC,
-              ),
-              SizedBox(
-                height: height * 0.04,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 
   Widget _top(double height) {
     return Container(
@@ -246,68 +374,35 @@ class _ProfileEditState extends State<ProfileEdit> {
                         onTap: () {
                           Navigator.of(context).pop(context);
                         },
-                        child: Theme.of(context).platform == TargetPlatform.iOS
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.045,
-                                  width: MediaQuery.of(context).size.height *
-                                      0.045,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.red[500],
-                                        Colors.red[900],
-                                      ],
-                                    ),
-                                  ),
-                                  child: CupertinoButton(
-                                    color: Colors.transparent,
-                                    child: Icon(
-                                      Icons.arrow_back_ios,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                ),
-                              )
-                            : Padding(
-                                padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.045,
-                                  width: MediaQuery.of(context).size.height *
-                                      0.045,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.red[500],
-                                        Colors.red[900],
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black87,
-                                        blurRadius: 7,
-                                        offset: Offset(2, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_back,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.height * 0.01,
+                          ),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.045,
+                            width: MediaQuery.of(context).size.height * 0.045,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.red[500],
+                                  Colors.red[900],
+                                ],
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black87,
+                                  blurRadius: 7,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -319,54 +414,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                         color: kTextGrey,
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.028,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(height * 0.2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black87,
-                            blurRadius: 4,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(height * 0.2),
-                        child: Material(
-                          color: kTextGrey,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            splashColor: Colors.white,
-                            child: Container(
-                              height: height * 0.045,
-                              width: height * 0.045,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  height * 0.2,
-                                ),
-                                border: Border.all(
-                                  width: 2,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.done,
-                                  color: Colors.white,
-                                  size: height * 0.022,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                   ],

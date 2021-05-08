@@ -91,7 +91,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                   : CrossFadeState.showFirst,
               firstChild: Padding(
                 padding: EdgeInsets.only(
-                  top: widget.height * 0.08,
+                  top: widget.height * 0.03,
                 ),
                 child: InkWell(
                   onTap: () {
@@ -110,36 +110,56 @@ class _MenuButtonsState extends State<MenuButtons> {
                   },
                   child: Container(
                     width: widget.width * 0.3,
-                    height: widget.height * 0.08,
-                    child: Text(
-                      "Газрын\nзураг",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 16.0,
-                      ),
+                    height: widget.height * 0.13,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: widget.width * 0.1,
+                          height: widget.height * 0.07,
+                          child: Image.asset("assets/images/home_map.png"),
+                        ),
+                        Text(
+                          "Байршил",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: kTextGrey,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
               secondChild: Padding(
                 padding: EdgeInsets.only(
-                  top: widget.height * 0.066,
+                  top: widget.height * 0.03,
                 ),
                 child: Container(
                   width: widget.width * 0.3,
-                  height: widget.height * 0.08,
+                  height: widget.height * 0.13,
                   child: Stack(
                     children: [
                       Align(
                         alignment: Alignment.center,
-                        child: Text(
-                          "Газрын\nзураг",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: kTextGrey,
-                            fontSize: 14.0,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: widget.width * 0.1,
+                              height: widget.height * 0.07,
+                              child: Image.asset("assets/images/home_map.png"),
+                            ),
+                            Text(
+                              "Байршил",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: kTextGrey,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Align(
@@ -148,7 +168,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                           opacity: 0.5,
                           child: Container(
                             width: widget.width * 0.3,
-                            height: widget.height * 0.08,
+                            height: widget.height * 0.14,
                             child: Image.asset(
                               "assets/images/button_click.png",
                               fit: BoxFit.cover,
@@ -171,7 +191,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                 _sosBtn ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             firstChild: Padding(
               padding: EdgeInsets.only(
-                top: widget.height * 0.184,
+                top: widget.height * 0.16,
                 right: MediaQuery.of(context).size.height * 0.34,
               ),
               child: InkWell(
@@ -191,39 +211,57 @@ class _MenuButtonsState extends State<MenuButtons> {
                 },
                 child: Container(
                   width: widget.width * 0.22,
-                  height: widget.height * 0.1,
-                  child: Center(
-                    child: Text(
-                      "SOS",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 16.0,
+                  height: widget.height * 0.13,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: widget.width * 0.1,
+                        height: widget.height * 0.07,
+                        child: Image.asset("assets/images/home_sos.png"),
                       ),
-                    ),
+                      Text(
+                        "SOS",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: kTextGrey,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
             secondChild: Padding(
               padding: EdgeInsets.only(
-                top: widget.height * 0.184,
+                top: widget.height * 0.16,
                 right: MediaQuery.of(context).size.height * 0.34,
               ),
               child: Container(
                 width: widget.width * 0.22,
-                height: widget.height * 0.1,
+                height: widget.height * 0.13,
                 child: Stack(
                   children: [
                     Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        "SOS",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: kTextGrey,
-                          fontSize: 14.0,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: widget.width * 0.1,
+                            height: widget.height * 0.07,
+                            child: Image.asset("assets/images/home_sos.png"),
+                          ),
+                          Text(
+                            "SOS",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: kTextGrey,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Align(
@@ -250,8 +288,8 @@ class _MenuButtonsState extends State<MenuButtons> {
           alignment: Alignment.topCenter,
           child: Padding(
             padding: EdgeInsets.only(
-              top: widget.height * 0.184,
-              left: MediaQuery.of(context).size.height * 0.34,
+              top: widget.height * 0.16,
+              left: MediaQuery.of(context).size.height * 0.35,
             ),
             child: AnimatedCrossFade(
               duration: Duration(milliseconds: 200),
@@ -275,33 +313,51 @@ class _MenuButtonsState extends State<MenuButtons> {
                 },
                 child: Container(
                   width: widget.width * 0.22,
-                  height: widget.height * 0.1,
-                  child: Center(
-                    child: Text(
-                      "Мэдээ",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 16.0,
+                  height: widget.height * 0.13,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: widget.width * 0.1,
+                        height: widget.height * 0.07,
+                        child: Image.asset("assets/images/home_info.png"),
                       ),
-                    ),
+                      Text(
+                        "Мэдээ",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: kTextGrey,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
               secondChild: Container(
                 width: widget.width * 0.22,
-                height: widget.height * 0.1,
+                height: widget.height * 0.13,
                 child: Stack(
                   children: [
                     Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        "Мэдээ",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: kTextGrey,
-                          fontSize: 14.0,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: widget.width * 0.1,
+                            height: widget.height * 0.07,
+                            child: Image.asset("assets/images/home_info.png"),
+                          ),
+                          Text(
+                            "Мэдээ",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: kTextGrey,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Align(
@@ -328,7 +384,7 @@ class _MenuButtonsState extends State<MenuButtons> {
           alignment: Alignment.topCenter,
           child: Padding(
             padding: EdgeInsets.only(
-              top: widget.height * 0.372,
+              top: widget.height * 0.35,
               right: MediaQuery.of(context).size.height * 0.24,
             ),
             child: AnimatedCrossFade(
@@ -353,33 +409,53 @@ class _MenuButtonsState extends State<MenuButtons> {
                 },
                 child: Container(
                   width: widget.width * 0.22,
-                  height: widget.height * 0.1,
+                  height: widget.height * 0.13,
                   child: Center(
-                    child: Text(
-                      "Худалдаа",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 16.0,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: widget.width * 0.1,
+                          height: widget.height * 0.07,
+                          child: Image.asset("assets/images/home_shop.png"),
+                        ),
+                        Text(
+                          "Худалдаа",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: kTextGrey,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
               secondChild: Container(
                 width: widget.width * 0.22,
-                height: widget.height * 0.1,
+                height: widget.height * 0.13,
                 child: Stack(
                   children: [
                     Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        "Худалдаа",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: kTextGrey,
-                          fontSize: 14.0,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: widget.width * 0.1,
+                            height: widget.height * 0.07,
+                            child: Image.asset("assets/images/home_shop.png"),
+                          ),
+                          Text(
+                            "Худалдаа",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: kTextGrey,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Align(
@@ -406,7 +482,7 @@ class _MenuButtonsState extends State<MenuButtons> {
           alignment: Alignment.topCenter,
           child: Padding(
             padding: EdgeInsets.only(
-              top: widget.height * 0.372,
+              top: widget.height * 0.353,
               left: MediaQuery.of(context).size.height * 0.24,
             ),
             child: AnimatedCrossFade(
@@ -431,33 +507,52 @@ class _MenuButtonsState extends State<MenuButtons> {
                 },
                 child: Container(
                   width: widget.width * 0.22,
-                  height: widget.height * 0.1,
-                  child: Center(
-                    child: Text(
-                      "Хувийн\nтохиргоо",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: kTextGrey,
-                        fontSize: 16.0,
+                  height: widget.height * 0.13,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: widget.width * 0.1,
+                        height: widget.height * 0.065,
+                        child: Image.asset("assets/images/home_profile.png"),
                       ),
-                    ),
+                      Text(
+                        "Бүртгэл",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: kTextGrey,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
               secondChild: Container(
                 width: widget.width * 0.22,
-                height: widget.height * 0.1,
+                height: widget.height * 0.13,
                 child: Stack(
                   children: [
                     Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        "Хувийн\nтохиргоо",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: kTextGrey,
-                          fontSize: 14.0,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: widget.width * 0.1,
+                            height: widget.height * 0.065,
+                            child:
+                                Image.asset("assets/images/home_profile.png"),
+                          ),
+                          Text(
+                            "Бүртгэл",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: kTextGrey,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Align(

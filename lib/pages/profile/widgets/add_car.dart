@@ -76,32 +76,6 @@ class _AddCarState extends State<AddCar> {
 
   Widget _info(double height, double width) => Column(
         children: <Widget>[
-          // Padding(
-          //   padding: EdgeInsets.only(
-          //     top: height * 0.016,
-          //   ),
-          //   child: InkWell(
-          //     onTap: () {
-          //       getImage();
-          //     },
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: [
-          //         Text(
-          //           "Зураг оруулах",
-          //           style: TextStyle(
-          //             color: kTextGrey,
-          //             fontWeight: FontWeight.bold,
-          //           ),
-          //         ),
-          //         Icon(
-          //           Icons.add,
-          //           color: kTextGrey,
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
           Container(
             padding: EdgeInsets.all(20.0),
             child: Form(
@@ -110,14 +84,6 @@ class _AddCarState extends State<AddCar> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // ClipRRect(
-                  //   borderRadius: BorderRadius.circular(35),
-                  //   child: Image.asset(
-                  //     "assets/images/child.png",
-                  //     width: 70,
-                  //   ),
-                  // ),
-                  // SizedBox(height: 30),
                   DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
@@ -138,25 +104,6 @@ class _AddCarState extends State<AddCar> {
                   Container(
                     width: double.infinity,
                     child: TextFormField(
-                      controller: _nameController,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Машины нэрээ оруулна уу!';
-                        }
-                        if (value.length <= 2) {
-                          return 'Үсгийн хэмжээ бага байна!';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Машины нэр',
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    child: TextFormField(
                       controller: _markNameController,
                       validator: (value) {
                         if (value.isEmpty) {
@@ -169,6 +116,25 @@ class _AddCarState extends State<AddCar> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Үйлдвэрлэгч',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _nameController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Машины нэрээ оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Машины нэр',
                       ),
                     ),
                   ),
@@ -236,8 +202,7 @@ class _AddCarState extends State<AddCar> {
                               if (result["success"]) {
                                 UserPreferences()
                                     .saveUserCars(json.encode(result["data"]));
-                                Navigator.popAndPushNamed(
-                                    context, "/profile_car_edit");
+                                Navigator.popAndPushNamed(context, "/profile");
                               }
                             } else {
                               if (response.statusCode == 401) {
@@ -303,69 +268,36 @@ class _AddCarState extends State<AddCar> {
                           onTap: () {
                             Navigator.of(context).pop(context);
                           },
-                          child: Theme.of(context).platform ==
-                                  TargetPlatform.iOS
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                    ),
-                                    child: CupertinoButton(
-                                      color: Colors.transparent,
-                                      child: Icon(
-                                        Icons.arrow_back_ios,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black87,
-                                          blurRadius: 7,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.height * 0.01,
+                            ),
+                            child: Container(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.045,
+                              width: MediaQuery.of(context).size.height * 0.045,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.red[500],
+                                    Colors.red[900],
+                                  ],
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black87,
+                                    blurRadius: 7,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(

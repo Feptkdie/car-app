@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carpro_app/helpers/user_preferences.dart';
 import 'package:carpro_app/models/user.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +17,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Future<User> _userPrefs;
   bool isLogged = false;
+  User _currentUser;
+  dynamic _currentCar;
 
   @override
   void initState() {
@@ -28,6 +32,15 @@ class _ProfilePageState extends State<ProfilePage> {
         Navigator.pushReplacementNamed(context, "/login");
       } else {
         setState(() {
+          _currentUser = user;
+
+          if (_currentUser.cars != null) {
+            var cars = json.decode(_currentUser.cars);
+            if (cars.length > 0) _currentCar = cars[0];
+          }
+
+          print(_currentCar);
+
           isLogged = true;
         });
       }
@@ -93,10 +106,15 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 height: height * 0.34,
                 width: double.infinity,
-                child: Image.asset(
-                  "assets/images/prius_profile.jpg",
-                  fit: BoxFit.cover,
-                ),
+                child: (_currentCar != null && _currentCar["cover"] != null)
+                    ? Image.network(
+                        _currentCar["cover"],
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        "assets/images/prius_profile.jpg",
+                        fit: BoxFit.cover,
+                      ),
               ),
               Container(
                 height: height * 0.34,
@@ -144,7 +162,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Padding(
                                 padding: EdgeInsets.only(left: height * 0.05),
                                 child: Text(
-                                  "УБА 2424",
+                                  (_currentCar != null &&
+                                          _currentCar["country_number"] != null)
+                                      ? _currentCar["country_number"]
+                                      : "",
                                   style: TextStyle(
                                     fontSize: height * 0.024,
                                     fontWeight: FontWeight.w500,
@@ -176,12 +197,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(
                       height * 0.2,
                     ),
-                    child: Image.asset(
-                      "assets/images/me.jpg",
-                      fit: BoxFit.cover,
-                      height: height * 0.14,
-                      width: height * 0.14,
-                    ),
+                    child: (_currentUser != null && _currentUser.avatar != "")
+                        ? Image.network(
+                            _currentUser.avatar,
+                            fit: BoxFit.cover,
+                            height: height * 0.14,
+                            width: height * 0.14,
+                          )
+                        : Image.asset(
+                            "assets/images/avatar.png",
+                            fit: BoxFit.cover,
+                            height: height * 0.14,
+                            width: height * 0.14,
+                          ),
                   ),
                 ),
               ),
@@ -193,7 +221,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     left: width * 0.05,
                   ),
                   child: Text(
-                    "TOYOTA",
+                    (_currentUser != null &&
+                            _currentCar != null &&
+                            _currentCar["mark_name"] != null)
+                        ? _currentCar["mark_name"]
+                        : "",
                     style: TextStyle(
                       fontSize: height * 0.018,
                       fontWeight: FontWeight.w300,
@@ -202,23 +234,58 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: height * 0.056,
-                    left: width * 0.05,
-                  ),
-                  child: Text(
-                    "PRIUS 30",
-                    style: TextStyle(
-                      fontSize: height * 0.023,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+              if (_currentUser != null && _currentCar != null)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: height * 0.056,
+                      left: width * 0.05,
+                    ),
+                    child: DropdownButton<String>(
+                      // isExpanded: true,
+                      dropdownColor: kPrimaryColor.withOpacity(0.8),
+                      value: _currentCar["id"].toString(),
+                      items: json
+                          .decode(_currentUser.cars)
+                          .map<DropdownMenuItem<String>>((map) {
+                        return DropdownMenuItem<String>(
+                          value: map["id"].toString(),
+                          child: Text(
+                            map["name"].toString(),
+                            style: TextStyle(
+                              fontSize: height * 0.023,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          print("val: $val");
+                          if (_currentUser != null &&
+                              _currentUser.cars != null) {
+                            var cars = json.decode(_currentUser.cars);
+
+                            print("cars: $cars");
+
+                            if (cars.length > 0) {
+                              var findCar = cars.firstWhere(
+                                  (car) =>
+                                      car["id"].toString() == val.toString(),
+                                  orElse: () => null);
+                              if (findCar != null) {
+                                print("findCar: $findCar");
+                                _currentCar = findCar;
+                              }
+                            }
+                          }
+                        });
+                      },
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -233,14 +300,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "ALTANKHUYAG ",
+                    (_currentUser != null && _currentUser.lastname != null)
+                        ? _currentUser.lastname.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextGrey,
                       fontWeight: FontWeight.w300,
                     ),
                   ),
                   Text(
-                    " BAYARBILEG",
+                    (_currentUser != null && _currentUser.firstname != null)
+                        ? _currentUser.firstname.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextDark,
                       fontWeight: FontWeight.bold,
@@ -261,7 +332,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(width: width * 0.02),
                   Text(
-                    "9911-5053",
+                    (_currentUser != null && _currentUser.phone != null)
+                        ? _currentUser.phone.toUpperCase()
+                        : "",
                     style: TextStyle(
                       color: kTextGrey,
                       fontSize: height * 0.016,
@@ -273,299 +346,288 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.032,
-            right: width * 0.04,
-            left: width * 0.04,
+        // Padding(
+        //   padding: EdgeInsets.only(
+        //     top: height * 0.032,
+        //     right: width * 0.04,
+        //     left: width * 0.04,
+        //   ),
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       Divider(),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //         children: [
+        //           Text(
+        //             "  Үйлдвэрлэсэн он",
+        //             style: TextStyle(
+        //               color: kTextGrey,
+        //               fontSize: height * 0.018,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //           ),
+        //           Text(
+        //             "2011  ",
+        //             style: TextStyle(
+        //               color: kTextDark,
+        //               fontSize: height * 0.022,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       Divider(),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //         children: [
+        //           Text(
+        //             "  Орж ирсэн он",
+        //             style: TextStyle(
+        //               color: kTextGrey,
+        //               fontSize: height * 0.018,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //           ),
+        //           Text(
+        //             "2015  ",
+        //             style: TextStyle(
+        //               color: kTextDark,
+        //               fontSize: height * 0.022,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       Divider(),
+        //       Row(
+        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //         children: [
+        //           Text(
+        //             "  Өнгө",
+        //             style: TextStyle(
+        //               color: kTextGrey,
+        //               fontSize: height * 0.018,
+        //               fontWeight: FontWeight.w400,
+        //             ),
+        //           ),
+        //           Row(
+        //             mainAxisAlignment: MainAxisAlignment.center,
+        //             children: [
+        //               Container(
+        //                 height: 12.0,
+        //                 width: 12.0,
+        //                 decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(
+        //                     50.0,
+        //                   ),
+        //                   color: Colors.white,
+        //                 ),
+        //               ),
+        //               Text(
+        //                 "  Цагаан  ",
+        //                 style: TextStyle(
+        //                   color: kTextDark,
+        //                   fontSize: height * 0.022,
+        //                   fontWeight: FontWeight.w400,
+        //                 ),
+        //               ),
+        //             ],
+        //           ),
+        //         ],
+        //       ),
+        //       Divider(),
+        //     ],
+        //   ),
+        // ),
+        if (_currentCar != null && _currentCar["parts"] != null)
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: _currentCar["parts"].length,
+            itemBuilder: (context, index) {
+              return _part(_currentCar["parts"][index]);
+            },
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "  Аралын дугаар",
-                    style: TextStyle(
-                      color: kTextGrey,
-                      fontSize: height * 0.018,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    "YKP39  ",
-                    style: TextStyle(
-                      color: kTextDark,
-                      fontSize: height * 0.022,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "  Үйлдвэрлэсэн он",
-                    style: TextStyle(
-                      color: kTextGrey,
-                      fontSize: height * 0.018,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    "2011  ",
-                    style: TextStyle(
-                      color: kTextDark,
-                      fontSize: height * 0.022,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "  Орж ирсэн он",
-                    style: TextStyle(
-                      color: kTextGrey,
-                      fontSize: height * 0.018,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    "2015  ",
-                    style: TextStyle(
-                      color: kTextDark,
-                      fontSize: height * 0.022,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "  Өнгө",
-                    style: TextStyle(
-                      color: kTextGrey,
-                      fontSize: height * 0.018,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 12.0,
-                        width: 12.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            50.0,
-                          ),
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        "  Цагаан  ",
-                        style: TextStyle(
-                          color: kTextDark,
-                          fontSize: height * 0.022,
-                          fontWeight: FontWeight.w400,
-                        ),
+        if (_currentCar != null)
+          Padding(
+            padding: EdgeInsets.only(
+              top: height * 0.022,
+              right: width * 0.04,
+              left: width * 0.04,
+              bottom: height * 0.022,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 4,
+                        offset: Offset(2, 2),
                       ),
                     ],
                   ),
-                ],
-              ),
-              Divider(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.032,
-            right: width * 0.04,
-            left: width * 0.04,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                      height * 0.01,
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    height * 0.01,
-                  ),
-                  child: Material(
-                    color: Colors.white.withOpacity(0.9),
-                    child: InkWell(
-                      splashColor: kTextGrey,
-                      onTap: () {
-                        Navigator.pushNamed(context, "/edit_part");
-                      },
-                      child: Container(
-                        height: height * 0.07,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.4,
-                            color: Colors.grey,
+                    child: Material(
+                      color: Colors.white.withOpacity(
+                        0.9,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, "/add_part",
+                              arguments: _currentCar["id"]);
+                        },
+                        splashColor: kTextGrey,
+                        child: Container(
+                          height: height * 0.07,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1.4,
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              height * 0.01,
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(
-                            height * 0.01,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: height * 0.022,
+                              right: height * 0.01,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Үйлчилгээ бүртгэх",
+                                  style: TextStyle(
+                                    fontSize: height * 0.018,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.add,
+                                  color: kGreyColor,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: height * 0.01,
-                            right: height * 0.01,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _part(dynamic part) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 15.0,
+        right: 15.0,
+        left: 15.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Material(
+                color: Colors.white.withOpacity(0.9),
+                child: InkWell(
+                  splashColor: kTextGrey,
+                  onTap: () {
+                    Navigator.pushNamed(context, "/edit_part");
+                  },
+                  child: Container(
+                    height: 50.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1.4,
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        10.0,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 10.0,
+                        right: 10.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              Row(
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: 10.0,
+                                ),
+                                child: Image.asset(
+                                  "assets/images/engine_oil.png",
+                                  color: kTextGrey,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: height * 0.008,
-                                    ),
-                                    child: Image.asset(
-                                      "assets/images/engine_oil.png",
-                                      color: kTextGrey,
+                                  Text(
+                                    part["name"].toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.0,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: height * 0.01,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Авто тосол",
-                                        style: TextStyle(
-                                          fontSize: height * 0.018,
-                                        ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      part["purchased_at"],
+                                      style: TextStyle(
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.w300,
                                       ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          "Feb 6, 2021      ",
-                                          style: TextStyle(
-                                            fontSize: height * 0.014,
-                                            fontWeight: FontWeight.w300,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ],
                               ),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                color: kGreyColor,
-                              ),
                             ],
                           ),
-                        ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: kGreyColor,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            top: height * 0.022,
-            right: width * 0.04,
-            left: width * 0.04,
-            bottom: height * 0.022,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                    height * 0.01,
-                  ),
-                  child: Material(
-                    color: Colors.white.withOpacity(
-                      0.9,
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, "/add_part");
-                      },
-                      splashColor: kTextGrey,
-                      child: Container(
-                        height: height * 0.07,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.4,
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            height * 0.01,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: height * 0.022,
-                            right: height * 0.01,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Эд анги нэмэх",
-                                style: TextStyle(
-                                  fontSize: height * 0.018,
-                                ),
-                              ),
-                              Icon(
-                                Icons.add,
-                                color: kGreyColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -592,7 +654,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: GestureDetector(
                         onTap: () {
-                          // Navigator.of(context).pop(context);
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               "/home", (Route<dynamic> route) => false);
                         },
@@ -749,9 +810,38 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: kColor2,
                           child: InkWell(
                             onTap: () {
-                              UserPreferences().removeUser();
-                              Navigator.pushNamed(context, "/home");
-                              print("logout");
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content:
+                                        Text("Та гарахдаа итгэлтэй байна уу"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text(
+                                          "БОЛИХ",
+                                          style: TextStyle(color: kTextDark),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(context);
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text(
+                                          "ГАРАХ",
+                                          style:
+                                              TextStyle(color: kPrimaryColor),
+                                        ),
+                                        onPressed: () {
+                                          UserPreferences().removeUser();
+                                          Navigator.pushNamed(context, "/home");
+                                          print("logout");
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             splashColor: Colors.white,
                             child: Container(

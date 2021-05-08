@@ -23,11 +23,13 @@ class AuthProvider with ChangeNotifier {
   Status get registeredStatus => _registeredStatus;
 
   Future<Map<String, dynamic>> register(
-      String username, String email, String password) async {
+      String lastname, String firstname, String email, String password) async {
     final Map<String, dynamic> formData = {
-      "username": username,
+      "lastname": lastname,
+      "firstname": firstname,
       "email": email,
       "password": password,
+      "phone": ""
     };
 
     _registeredStatus = Status.Registering;
@@ -39,25 +41,22 @@ class AuthProvider with ChangeNotifier {
       body: json.encode(formData),
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       var body = json.decode(response.body);
 
-      // var user = {
-      //   "id": body["user"]["id"]["S"],
-      //   "username": body["user"]["username"]["S"],
-      //   "email": body["user"]["email"]["S"],
-      //   "token": body["user"]["token"],
-      //   "provider": body["user"]["provider"]["S"],
-      //   "providerId": body["user"]["provider_id"]["S"],
-      //   "gender": body["user"]["gender"]["S"],
-      //   "phone": body["user"]["phone"]["S"],
-      //   "image": body["user"]["image"]["S"],
-      //   "lastname": body["user"]["lastname"]["S"],
-      //   "firstname": body["user"]["firstname"]["S"],
-      // };
+      var user = {
+        "id": body["user"]["id"],
+        "lastname": body["user"]["lastname"],
+        "firstname": body["user"]["firstname"],
+        "email": body["user"]["email"],
+        "token": body["access_token"],
+        "phone": body["user"]["phone"],
+        "avatar": body["user"]["avatar"],
+        "cars": json.encode(body["user"]["cars"]),
+      };
 
-      // User authUser = User.fromJson(user);
-      // UserPreferences().saveUser(authUser);
+      User authUser = User.fromJson(user);
+      UserPreferences().saveUser(authUser);
 
       _registeredStatus = Status.Registered;
       notifyListeners();
@@ -96,8 +95,8 @@ class AuthProvider with ChangeNotifier {
         "id": body["user"]["id"],
         "email": body["user"]["email"],
         "token": body["access_token"],
-        "lastname": "",
-        "firstname": "",
+        "lastname": body["user"]["lastname"],
+        "firstname": body["user"]["firstname"],
         "phone": body["user"]["phone"],
         "avatar": body["user"]["avatar"],
         "cars": json.encode(body["user"]["cars"]),

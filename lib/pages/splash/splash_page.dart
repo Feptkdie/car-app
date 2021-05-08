@@ -1,7 +1,14 @@
 import 'dart:convert';
 
 import 'package:carpro_app/models/car.dart';
+import 'package:carpro_app/models/company.dart';
+import 'package:carpro_app/models/company_category.dart';
+import 'package:carpro_app/models/info.dart';
+import 'package:carpro_app/models/setting.dart';
 import 'package:carpro_app/models/sos.dart';
+import 'package:carpro_app/providers/company_category_provider.dart';
+import 'package:carpro_app/providers/info_provider.dart';
+import 'package:carpro_app/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carpro_app/models/sos_category.dart';
 import 'package:carpro_app/providers/sos_category_provider.dart';
@@ -37,6 +44,24 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   AnimationController animationController;
 
+  void setSettingsProvider(List<dynamic> list) {
+    List<Setting> settings = [];
+
+    list.forEach((data) {
+      var item = {
+        "id": data["id"],
+        "phone": data["phone"],
+        "about": data["about"],
+        "sliders": data["sliders"],
+      };
+
+      Setting setting = Setting.fromJson(item);
+      settings.add(setting);
+    });
+
+    context.read<SettingProvider>().setSettings(settings);
+  }
+
   void setCarProvider(List<dynamic> list) {
     List<Car> cars = [];
 
@@ -69,6 +94,27 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     });
 
     context.read<CarProvider>().setCars(cars);
+  }
+
+  void setInfoProvider(List<dynamic> list) {
+    List<Info> infos = [];
+
+    list.forEach((data) {
+      var item = {
+        "id": data["id"],
+        "title": data["title"],
+        "subtitle": data["subtitle"],
+        "fileMode": data["fileMode"],
+        "filePath": data["filePath"],
+        "content": data["content"],
+        "createdAt": data["createdAt"],
+      };
+
+      Info info = Info.fromJson(item);
+      infos.add(info);
+    });
+
+    context.read<InfoProvider>().setInfos(infos);
   }
 
   void setSosCategoryProvider(List<dynamic> list) {
@@ -106,6 +152,41 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     context.read<SosCategoryProvider>().setSosCategories(sosCategories);
   }
 
+  void setCompanyCategoryProvider(List<dynamic> list) {
+    List<CompanyCategory> companyCategories = [];
+
+    list.forEach((data) {
+      List<Company> companies = [];
+      data["companies"].forEach((item) {
+        var companyItem = {
+          "id": item["id"],
+          "name": item["name"],
+          "logo": item["logo"],
+          "phone": item["phone"],
+          "coordX": item["coordX"],
+          "coordY": item["coordY"],
+          "jsonData": item["jsonData"],
+        };
+
+        Company company = Company.fromJson(companyItem);
+        companies.add(company);
+      });
+
+      var categoryItem = {
+        "id": data["id"],
+        "name": data["name"],
+        "companies": companies,
+      };
+
+      CompanyCategory companyCategory = CompanyCategory.fromJson(categoryItem);
+      companyCategories.add(companyCategory);
+    });
+
+    context
+        .read<CompanyCategoryProvider>()
+        .setCompanyCategories(companyCategories);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -114,8 +195,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     animationController.repeat();
 
     fetchData().then((data) {
+      setSettingsProvider(data["settings"]);
       setCarProvider(data["cars"]);
+      setInfoProvider(data["infos"]);
       setSosCategoryProvider(data["sos_categories"]);
+      setCompanyCategoryProvider(data["company_categories"]);
 
       Navigator.pushReplacementNamed(context, "/home");
     }).catchError((error, stackTrace) {

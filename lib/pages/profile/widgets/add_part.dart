@@ -1,5 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'package:carpro_app/helpers/app_url.dart';
+import 'package:carpro_app/helpers/user_preferences.dart';
+import 'package:carpro_app/widgets/custom_app_bar.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:progress_indicator_button/progress_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants.dart';
 
@@ -10,267 +17,206 @@ class AddPart extends StatefulWidget {
 }
 
 class _AddPartState extends State<AddPart> {
-  final partNameTEC = new TextEditingController();
-  final partStartAtTEC = new TextEditingController();
-  final partFixAtTEC = new TextEditingController();
-  final commentTEC = new TextEditingController();
+  final formKey = new GlobalKey<FormState>();
+
+  TextEditingController _nameController;
+  TextEditingController _purchasedAtController;
+  TextEditingController _replacedAtController;
+  TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _purchasedAtController = TextEditingController();
+    _replacedAtController = TextEditingController();
+    _descriptionController = TextEditingController();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    print(ModalRoute.of(context).settings.arguments);
+
     return Scaffold(
       backgroundColor: kBackColor2,
+      appBar: CustomAppBar(
+        height: 56.0,
+        title: "Үйлчилгээ бүртгэх",
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: new LinearGradient(
-                colors: [
-                  kBackColor1,
-                  kBackColor2,
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _nameController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Хоосон байна!";
+                        }
+                        if (value.length <= 2) {
+                          return "Үсгийн хэмжээ бага байна!";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Үйлчилгээний нэр",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _purchasedAtController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Хоосон байна!";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Эхлэх он сар",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _replacedAtController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Хоосон байна!";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Солисон он сар",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Хоосон байна!";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Нэмэлт тайлбар",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30.0),
+                  SizedBox(
+                    width: 80.0,
+                    height: 36.0,
+                    child: ProgressButton(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      strokeWidth: 2,
+                      color: kColor3,
+                      progressIndicatorSize: 20,
+                      child: Text(
+                        "Бүртгэх",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                      onPressed: (AnimationController controller) async {
+                        controller.forward();
+
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String token = prefs.getString("token") ?? null;
+
+                        if (token != null) {
+                          final form = formKey.currentState;
+
+                          if (form.validate()) {
+                            if (!controller.isCompleted) {
+                              final _userCarId =
+                                  ModalRoute.of(context).settings.arguments;
+
+                              final Map<String, dynamic> formData = {
+                                "user_car_id": _userCarId,
+                                "name": _nameController.text,
+                                "purchased_at": _purchasedAtController.text,
+                                "replaced_at": _replacedAtController.text,
+                                "description": _descriptionController.text,
+                              };
+
+                              var response = await http.post(
+                                AppUrl.baseURL + "/add-part",
+                                headers: {
+                                  "Authorization": "Bearer $token",
+                                  "Content-Type": "application/json",
+                                  "Accept": "application/json",
+                                },
+                                body: json.encode(formData),
+                              );
+
+                              if (response.statusCode == 200) {
+                                controller.reset();
+
+                                var result = json
+                                    .decode(utf8.decode(response.bodyBytes));
+
+                                if (result["success"]) {
+                                  UserPreferences().saveUserCars(
+                                      json.encode(result["data"]));
+                                  Navigator.popAndPushNamed(
+                                      context, "/profile");
+                                }
+                              } else {
+                                controller.reset();
+                                if (response.statusCode == 401) {
+                                  UserPreferences().removeUser();
+                                  Navigator.pushNamed(context, "/login");
+                                } else {
+                                  Flushbar(
+                                    margin: EdgeInsets.all(8),
+                                    borderRadius: 8,
+                                    message: "Error",
+                                    duration: Duration(seconds: 4),
+                                    icon: Icon(
+                                      Icons.info_outline,
+                                      size: 28.0,
+                                      color: Colors.blue[300],
+                                    ),
+                                  )..show(context);
+                                }
+                              }
+                            }
+                          } else {
+                            controller.reset();
+                          }
+                        } else {
+                          controller.reset();
+                          UserPreferences().removeUser();
+                          Navigator.pushNamed(context, "/login");
+                        }
+                      },
+                    ),
+                  ),
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                _top(height),
-                _info(height, width),
-              ],
             ),
           ),
         ),
       ),
     );
   }
-
-  Widget _info(double height, double width) => Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(
-              top: height * 0.04,
-              left: width * 0.06,
-              right: width * 0.06,
-              bottom: height * 0.02,
-            ),
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  decoration: InputDecoration(
-                    isDense: true,
-                    labelText: "Эд ангийн нэр",
-                    labelStyle: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  controller: partNameTEC,
-                ),
-                SizedBox(
-                  height: height * 0.012,
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                    isDense: true,
-                    labelText: "Авсан он сар",
-                    labelStyle: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  controller: partStartAtTEC,
-                ),
-                SizedBox(
-                  height: height * 0.012,
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                    isDense: true,
-                    labelText: "Солисон он сар",
-                    labelStyle: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  controller: partFixAtTEC,
-                ),
-                SizedBox(
-                  height: height * 0.012,
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                    isDense: true,
-                    labelText: "Нэмэлт мэдээлэл",
-                    labelStyle: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  controller: commentTEC,
-                ),
-                SizedBox(
-                  height: height * 0.04,
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-
-  Widget _top(double height) => Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(
-                right: height * 0.028,
-                top: height * 0.006,
-                bottom: height * 0.006,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(
-                          8.0,
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop(context);
-                          },
-                          child: Theme.of(context).platform ==
-                                  TargetPlatform.iOS
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                    ),
-                                    child: CupertinoButton(
-                                      color: Colors.transparent,
-                                      child: Icon(
-                                        Icons.arrow_back_ios,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.height *
-                                        0.01,
-                                  ),
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.045,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.red[500],
-                                          Colors.red[900],
-                                        ],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black87,
-                                          blurRadius: 7,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 8.0,
-                      ),
-                      Text(
-                        "Эд анги нэмэх",
-                        style: TextStyle(
-                          color: kTextGrey,
-                          fontWeight: FontWeight.bold,
-                          fontSize: height * 0.028,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(height * 0.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black87,
-                              blurRadius: 4,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(height * 0.2),
-                          child: Material(
-                            color: kTextGrey,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              splashColor: Colors.white,
-                              child: Container(
-                                height: height * 0.045,
-                                width: height * 0.045,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    height * 0.2,
-                                  ),
-                                  border: Border.all(
-                                    width: 2,
-                                    color: Colors.white.withOpacity(0.9),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.done,
-                                    color: Colors.white,
-                                    size: height * 0.022,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
 }

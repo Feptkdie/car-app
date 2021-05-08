@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:carpro_app/helpers/app_url.dart';
+import 'package:carpro_app/widgets/custom_app_bar.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:carpro_app/providers/auth_provider.dart';
@@ -29,83 +33,11 @@ class _LoginPageState extends State<LoginPage> {
     AuthProvider auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kBackColor2,
-        leading: Padding(
-          padding: const EdgeInsets.all(
-            6.0,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop(context);
-            },
-            child: Theme.of(context).platform == TargetPlatform.iOS
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                      ),
-                      child: CupertinoButton(
-                        color: Colors.transparent,
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
-                      width: MediaQuery.of(context).size.height * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red[500],
-                            Colors.red[900],
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black87,
-                            blurRadius: 7,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-          ),
-        ),
-        title: Text(
-          "Нэвтрэх",
-          style: TextStyle(
-            color: kTextGrey,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       backgroundColor: kBackColor2,
+      appBar: CustomAppBar(
+        height: 56.0,
+        title: "Нэвтрэх",
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (ctx, constraints) {
@@ -223,29 +155,29 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        // SizedBox(height: 80),
-                        // SizedBox(
-                        //   width: 250,
-                        //   height: 40,
-                        //   child: FlatButton(
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(20.0),
-                        //     ),
-                        //     color: Colors.white,
-                        //     padding: EdgeInsets.only(left: 5, right: 5),
-                        //     onPressed: () {
-                        //       Navigator.pushNamed(context, "/register");
-                        //     },
-                        //     child: Text(
-                        //       "Бүртгүүлэх",
-                        //       style: TextStyle(
-                        //         color: Colors.black.withOpacity(0.7),
-                        //         fontWeight: FontWeight.bold,
-                        //         fontSize: 13,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        SizedBox(height: 25),
+                        SizedBox(
+                          width: 250,
+                          height: 40,
+                          child: FlatButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            color: Colors.white,
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/register");
+                            },
+                            child: Text(
+                              "Бүртгүүлэх",
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.7),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
                         // SizedBox(height: 10),
                         // SizedBox(
                         //   width: 250,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:carpro_app/helpers/app_url.dart';
 import 'package:carpro_app/helpers/user_preferences.dart';
@@ -29,7 +30,36 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
 
   String _carStringList;
   String _curGroupName = "suudliin";
+  String _curCoverImage;
+
   String _selectedCarId;
+
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImageCamera() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future getImageGallery() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
 
   List<Map<String, dynamic>> groupNames = [
     {"text": "Суудлын", "value": "suudliin"},
@@ -52,6 +82,7 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
       var carList = json.decode(_carStringList);
       if (carList.length > 0) {
         _selectedCarId = carList[0]["id"].toString();
+        _curCoverImage = carList[0]["cover"];
         _curGroupName = carList[0]["group_name"];
         _nameController.text = carList[0]["name"];
         _markNameController.text = carList[0]["mark_name"];
@@ -157,28 +188,6 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
-                          // Container(
-                          //   padding: EdgeInsets.all(10.0),
-                          //   decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(10.0),
-                          //   ),
-                          //   child: FlatButton(
-                          //     color: kColor3,
-                          //     shape: RoundedRectangleBorder(
-                          //       borderRadius: BorderRadius.circular(20.0),
-                          //     ),
-                          //     child: Text(
-                          //       "Машин нэмэх",
-                          //       style: TextStyle(
-                          //         color: Colors.white,
-                          //       ),
-                          //     ),
-                          //     onPressed: () {
-                          //       // Navigator.pushNamed(context, "/add_car");
-                          //       Navigator.popAndPushNamed(context, "/add_car");
-                          //     },
-                          //   ),
-                          // ),
                           if (carList.length > 0)
                             Container(
                               margin: EdgeInsets.all(20),
@@ -203,6 +212,7 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                           orElse: () => null);
 
                                       if (findCarId != null) {
+                                        _curCoverImage = findCarId["cover"];
                                         _curGroupName = findCarId["group_name"];
                                         _nameController.text =
                                             findCarId["name"];
@@ -225,14 +235,57 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    // ClipRRect(
-                                    //   borderRadius: BorderRadius.circular(35),
-                                    //   child: Image.asset(
-                                    //     "assets/images/child.png",
-                                    //     width: 70,
-                                    //   ),
-                                    // ),
-                                    // SizedBox(height: 30),
+                                    _image == null
+                                        ? _curCoverImage != null
+                                            ? Image.network(
+                                                _curCoverImage,
+                                                height: 100.0,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Text('No image selected.')
+                                        : Image.file(
+                                            _image,
+                                            height: 100.0,
+                                          ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: 8.0,
+                                        ),
+                                        Container(
+                                          width: 100.0,
+                                          child: FlatButton(
+                                            child: Icon(
+                                              Icons.camera_alt,
+                                              color: Colors.redAccent,
+                                            ),
+                                            onPressed: this.getImageCamera,
+                                            color: Colors.white,
+                                          ),
+                                          margin: EdgeInsets.only(top: 20.0),
+                                        ),
+                                        SizedBox(
+                                          width: 8.0,
+                                        ),
+                                        Container(
+                                          width: 100.0,
+                                          child: FlatButton(
+                                            child: Icon(
+                                              Icons.image,
+                                              color: Colors.redAccent,
+                                            ),
+                                            onPressed: this.getImageGallery,
+                                            color: Colors.white,
+                                          ),
+                                          margin: EdgeInsets.only(top: 20.0),
+                                        ),
+                                        SizedBox(
+                                          width: 8.0,
+                                        ),
+                                      ],
+                                    ),
                                     DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
                                         isExpanded: true,
@@ -255,25 +308,6 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                     Container(
                                       width: double.infinity,
                                       child: TextFormField(
-                                        controller: _nameController,
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return 'Машины нэрээ оруулна уу!';
-                                          }
-                                          if (value.length <= 2) {
-                                            return 'Үсгийн хэмжээ бага байна!';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: InputDecoration(
-                                          labelText: 'Машины нэр',
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Container(
-                                      width: double.infinity,
-                                      child: TextFormField(
                                         controller: _markNameController,
                                         validator: (value) {
                                           if (value.isEmpty) {
@@ -286,6 +320,25 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                         },
                                         decoration: InputDecoration(
                                           labelText: 'Үйлдвэрлэгч',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      child: TextFormField(
+                                        controller: _nameController,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Машины нэрээ оруулна уу!';
+                                          }
+                                          if (value.length <= 2) {
+                                            return 'Үсгийн хэмжээ бага байна!';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Машины нэр',
                                         ),
                                       ),
                                     ),
@@ -330,6 +383,20 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                                     formKey.currentState;
 
                                                 if (form.validate()) {
+                                                  String coverImage;
+                                                  String coverName;
+
+                                                  if (_image != null) {
+                                                    List<int> imageBytes =
+                                                        _image
+                                                            .readAsBytesSync();
+                                                    coverImage = base64Encode(
+                                                        imageBytes);
+                                                    coverName = _image.path
+                                                        .split("/")
+                                                        .last;
+                                                  }
+
                                                   final Map<String, dynamic>
                                                       formData = {
                                                     "group_name": _curGroupName,
@@ -340,8 +407,12 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                                             .text,
                                                     "country_number":
                                                         _countryNumberController
-                                                            .text
+                                                            .text,
+                                                    "cover": coverImage,
+                                                    "cover_name": coverName,
                                                   };
+
+                                                  print(formData);
 
                                                   var response = await http.put(
                                                     AppUrl.baseURL +
@@ -362,6 +433,8 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                                     var result = json.decode(
                                                         utf8.decode(response
                                                             .bodyBytes));
+
+                                                    print(result);
 
                                                     if (result["success"]) {
                                                       print(result["data"]);
@@ -387,16 +460,18 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                                         ),
                                                       )..show(context);
 
-                                                      setState(() {
-                                                        _carStringList =
-                                                            json.encode(
-                                                                result["data"]);
-                                                      });
-                                                      // Navigator.popAndPushNamed(
-                                                      //     context, "/profile");
+                                                      // setState(() {
+                                                      //   _image = null;
+                                                      //   _carStringList =
+                                                      //       json.encode(
+                                                      //           result["data"]);
+                                                      // });
+                                                      Navigator.popAndPushNamed(
+                                                          context, "/profile");
                                                     }
                                                   } else {
                                                     print(response.statusCode);
+                                                    print(response.body);
 
                                                     if (response.statusCode ==
                                                         401) {
@@ -540,10 +615,11 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                       ),
                     )..show(ctx);
 
-                    setState(() {
-                      fetchData();
-                      // _carStringList = json.encode(result["data"]);
-                    });
+                    // setState(() {
+                    //   fetchData();
+                    //   // _carStringList = json.encode(result["data"]);
+                    // });
+                    Navigator.popAndPushNamed(ctx, "/profile");
                   }
                 } else {
                   print(response.body);

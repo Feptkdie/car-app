@@ -18,6 +18,17 @@ class UserPreferences {
     return true;
   }
 
+  Future<bool> updateUser(User user) async {
+    final SharedPreferences prefs = await _prefs;
+
+    // prefs.setString("email", user.email);
+    prefs.setString("lastname", user.lastname);
+    prefs.setString("firstname", user.firstname);
+    prefs.setString("phone", user.phone);
+    prefs.setString("avatar", user.avatar);
+    return true;
+  }
+
   Future<bool> saveUserCars(String cars) async {
     final SharedPreferences prefs = await _prefs;
     prefs.setString("cars", cars);
