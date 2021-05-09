@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carpro_app/constants.dart';
 import 'package:carpro_app/models/info.dart';
 import 'package:carpro_app/providers/info_provider.dart';
 import 'package:carpro_app/widgets/custom_app_bar.dart';
@@ -73,8 +74,19 @@ class _InfoPageState extends State<InfoPage> {
                       height: 180.0,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(strokeWidth: 1.5),
+                      placeholder: (context, url) => Container(
+                        height: 180.0,
+                        width: double.infinity,
+                        color: Colors.white.withOpacity(0.8),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              kPrimaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
                       errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
                   if (info.fileMode == "video")
@@ -83,10 +95,18 @@ class _InfoPageState extends State<InfoPage> {
                       height: 150.0,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => SizedBox(
-                        width: 30.0,
-                        height: 30.0,
-                        child: CircularProgressIndicator(strokeWidth: 1.5),
+                      placeholder: (context, url) => Container(
+                        height: 180.0,
+                        width: double.infinity,
+                        color: Colors.white.withOpacity(0.8),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              kPrimaryColor,
+                            ),
+                          ),
+                        ),
                       ),
                       errorWidget: (context, url, error) => Icon(Icons.error),
                     ),

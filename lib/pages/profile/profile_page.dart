@@ -692,7 +692,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: 8.0,
                     ),
                     Text(
-                      "Profile",
+                      "Бүртгэл",
                       style: TextStyle(
                         color: kTextGrey,
                         fontWeight: FontWeight.bold,

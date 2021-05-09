@@ -68,7 +68,7 @@ class _InfoDetailState extends State<InfoDetail> {
           ),
         ),
         title: Text(
-          "Мэдээлэл",
+          "Мэдээ",
           style: TextStyle(
             color: kTextGrey,
             fontWeight: FontWeight.bold,
@@ -233,11 +233,27 @@ class _InfoDetailState extends State<InfoDetail> {
                           // ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(5),
-                            child: Image(
-                              image: NetworkImage(
-                                info.filePath,
-                              ),
+                            child: CachedNetworkImage(
+                              imageUrl: info.filePath,
+                              height: MediaQuery.of(context).size.height * 0.2,
+                              width: MediaQuery.of(context).size.width,
                               fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.2,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.white.withOpacity(0.8),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      kPrimaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                             ),
                           ),
                         ),

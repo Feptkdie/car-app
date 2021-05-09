@@ -206,7 +206,7 @@ class _MenuButtonsState extends State<MenuButtons> {
                     setState(() {
                       _sosBtn = false;
                     });
-                    Navigator.pushNamed(context, "/sos");
+                    Navigator.pushNamed(context, "/sos_fav");
                   });
                 },
                 child: Container(

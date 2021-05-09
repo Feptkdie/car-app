@@ -83,13 +83,13 @@ class _PowerButtonState extends State<PowerButton> {
                     alignment: Alignment.center,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        left: widget.height * 0.05,
+                        right: widget.height * 0.008,
                       ),
                       child: Container(
                         child: Image.asset(
-                          "assets/images/power_button1.png",
-                          height: widget.height * 0.4,
-                          width: widget.height * 0.4,
+                          "assets/images/power_off.png",
+                          height: widget.height * 0.43,
+                          width: widget.height * 0.43,
                         ),
                       ),
                     ),
@@ -98,13 +98,13 @@ class _PowerButtonState extends State<PowerButton> {
                     alignment: Alignment.center,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        right: widget.height * 0.008,
+                        left: widget.height * 0.05,
                       ),
                       child: Container(
                         child: Image.asset(
-                          "assets/images/power_off.png",
-                          height: widget.height * 0.43,
-                          width: widget.height * 0.43,
+                          "assets/images/power_button1.png",
+                          height: widget.height * 0.4,
+                          width: widget.height * 0.4,
                         ),
                       ),
                     ),
@@ -131,21 +131,6 @@ class _PowerButtonState extends State<PowerButton> {
                     alignment: Alignment.center,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        left: widget.height * 0.05,
-                      ),
-                      child: Container(
-                        child: Image.asset(
-                          "assets/images/power_button1.png",
-                          height: widget.height * 0.4,
-                          width: widget.height * 0.4,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: EdgeInsets.only(
                         right: widget.height * 0.008,
                         bottom: widget.height * 0.006,
                       ),
@@ -154,6 +139,21 @@ class _PowerButtonState extends State<PowerButton> {
                           "assets/images/power_on.png",
                           height: widget.height * 0.42,
                           width: widget.height * 0.42,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: widget.height * 0.05,
+                      ),
+                      child: Container(
+                        child: Image.asset(
+                          "assets/images/power_button1.png",
+                          height: widget.height * 0.4,
+                          width: widget.height * 0.4,
                         ),
                       ),
                     ),

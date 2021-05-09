@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:progress_indicator_button/progress_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import '../../../constants.dart';
 
@@ -17,12 +18,14 @@ class AddPart extends StatefulWidget {
 }
 
 class _AddPartState extends State<AddPart> {
+  String _partCat = "Тос";
   final formKey = new GlobalKey<FormState>();
 
   TextEditingController _nameController;
   TextEditingController _purchasedAtController;
   TextEditingController _replacedAtController;
   TextEditingController _descriptionController;
+  TextEditingController _partWhereMade;
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _AddPartState extends State<AddPart> {
     _purchasedAtController = TextEditingController();
     _replacedAtController = TextEditingController();
     _descriptionController = TextEditingController();
+    _partWhereMade = TextEditingController();
   }
 
   @override
@@ -53,6 +57,40 @@ class _AddPartState extends State<AddPart> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Text(DateFormat('yyyy-MM-dd – kk:mm')
+                      .format(DateTime.now())
+                      .toString()),
+                  SizedBox(height: 10),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    value: _partCat,
+                    hint: Text("Тос"),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.black),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        _partCat = newValue;
+                      });
+                    },
+                    items: <String>[
+                      'Тос',
+                      'Дугуй',
+                      'Наклад',
+                      'Явах эд анги',
+                      'Бусад',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            color: kTextGrey,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                   Container(
                     width: double.infinity,
                     child: TextFormField(
@@ -67,7 +105,7 @@ class _AddPartState extends State<AddPart> {
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: "Үйлчилгээний нэр",
+                        labelText: "Солисон эд ангийн нэр",
                       ),
                     ),
                   ),
@@ -75,7 +113,7 @@ class _AddPartState extends State<AddPart> {
                   Container(
                     width: double.infinity,
                     child: TextFormField(
-                      controller: _purchasedAtController,
+                      controller: _partWhereMade,
                       validator: (value) {
                         if (value.isEmpty) {
                           return "Хоосон байна!";
@@ -83,23 +121,7 @@ class _AddPartState extends State<AddPart> {
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: "Эхлэх он сар",
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    child: TextFormField(
-                      controller: _replacedAtController,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Хоосон байна!";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: "Солисон он сар",
+                        labelText: "Хаана",
                       ),
                     ),
                   ),
@@ -121,7 +143,7 @@ class _AddPartState extends State<AddPart> {
                   ),
                   SizedBox(height: 30.0),
                   SizedBox(
-                    width: 80.0,
+                    width: 100.0,
                     height: 36.0,
                     child: ProgressButton(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -152,9 +174,15 @@ class _AddPartState extends State<AddPart> {
 
                               final Map<String, dynamic> formData = {
                                 "user_car_id": _userCarId,
+                                "category": _partCat,
                                 "name": _nameController.text,
-                                "purchased_at": _purchasedAtController.text,
-                                "replaced_at": _replacedAtController.text,
+                                "where_made": _partWhereMade.text,
+                                "purchased_at": DateFormat('yyyy-MM-dd – kk:mm')
+                                    .format(DateTime.now())
+                                    .toString(),
+                                "replaced_at": DateFormat('yyyy-MM-dd – kk:mm')
+                                    .format(DateTime.now())
+                                    .toString(),
                                 "description": _descriptionController.text,
                               };
 
@@ -167,6 +195,7 @@ class _AddPartState extends State<AddPart> {
                                 },
                                 body: json.encode(formData),
                               );
+                              print(response.body.toString());
 
                               if (response.statusCode == 200) {
                                 controller.reset();

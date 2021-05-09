@@ -1,5 +1,6 @@
 import 'package:carpro_app/pages/info/info_detail.dart';
 import 'package:flutter/material.dart';
+import 'pages/sos/sos_fav.dart';
 import 'pages/splash/splash_page.dart';
 import 'pages/home/home_page.dart';
 import 'pages/auth/login_page.dart';
@@ -33,4 +34,5 @@ final Map<String, WidgetBuilder> routes = {
   AddPart.routeName: (context) => AddPart(),
   EditPart.routeName: (context) => EditPart(),
   InfoDetail.routeName: (context) => InfoDetail(),
+  SosFav.routeName: (context) => SosFav(),
 };
