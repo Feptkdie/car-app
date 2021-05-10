@@ -3,6 +3,7 @@ import 'package:carpro_app/models/info.dart';
 import 'package:carpro_app/providers/info_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_social_content_share/flutter_social_content_share.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -138,6 +139,9 @@ class _InfoDetailState extends State<InfoDetail> {
                                 Expanded(
                                   flex: -1,
                                   child: InkWell(
+                                    onTap: () {
+                                      shareOnFacebook();
+                                    },
                                     child: Icon(
                                       Icons.more_horiz,
                                       size: MediaQuery.of(context).size.height *
@@ -309,74 +313,11 @@ class _InfoDetailState extends State<InfoDetail> {
     });
   }
 
-  Widget _infoItem(Info info) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if (info.fileMode == "image")
-                CachedNetworkImage(
-                  imageUrl: info.filePath,
-                  height: 180.0,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      CircularProgressIndicator(strokeWidth: 1.5),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
-              if (info.fileMode == "video")
-                CachedNetworkImage(
-                  imageUrl: "http://i3.ytimg.com/vi/${info.filePath}/0.jpg",
-                  height: 150.0,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => SizedBox(
-                    width: 30.0,
-                    height: 30.0,
-                    child: CircularProgressIndicator(strokeWidth: 1.5),
-                  ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 10.0,
-                  bottom: 10.0,
-                ),
-                child: Text(
-                  info.title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13.0,
-                  ),
-                ),
-              ),
-              Row(
-                children: <Widget>[
-                  Image.asset(
-                    "assets/images/clock.png",
-                    width: 12.0,
-                  ),
-                  SizedBox(width: 10.0),
-                  Text(
-                    info.createdAt.substring(0, 10),
-                    style: TextStyle(fontSize: 11.0),
-                  ),
-                ],
-              ),
-              Divider(),
-            ],
-          ),
-        ),
-        if (info.fileMode == "video")
-          Positioned(
-            top: 10.0,
-            right: 30.0,
-            child: Image.asset("assets/images/youtube.png", width: 30.0),
-          ),
-      ],
-    );
+  shareOnFacebook() async {
+    String result = await FlutterSocialContentShare.share(
+        type: ShareType.facebookWithoutImage,
+        url: "https://www.mindsymbol.com",
+        quote: "captions");
+    print(result);
   }
 }

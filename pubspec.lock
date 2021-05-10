@@ -207,6 +207,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.11"
+  flutter_social_content_share:
+    dependency: "direct main"
+    description:
+      name: flutter_social_content_share
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   flutter_svg:
     dependency: "direct main"
     description:

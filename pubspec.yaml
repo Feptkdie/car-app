@@ -45,6 +45,7 @@ dependencies:
   flutter_swiper: ^1.1.6
   slide_popup_dialog: ^0.0.2
   progress_indicator_button: ^0.0.3
+  flutter_social_content_share: ^0.0.4
   
 dev_dependencies:
   flutter_test:
