@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.carpro_app">
+    package="mple.carpro_app">
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -21,10 +21,10 @@
                android:value="AIzaSyCv0lmaPCCEy914LR9ZXTTtnOhDbasSEqU"/>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="1926820084127140" />
+            android:value="489608542286440" />
         <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:authorities="com.facebook.app.FacebookContentProvider[1926820084127140]"
+            android:authorities="com.facebook.app.FacebookContentProvider[489608542286440]"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
