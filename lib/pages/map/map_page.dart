@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carpro_app/models/company.dart';
 import 'package:carpro_app/models/company_category.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +36,10 @@ class _MapPageState extends State<MapPage> {
     tilt: 0,
     zoom: 12.4,
   );
+
+  double toRadius(double x) {
+    return x * pi / 180;
+  }
 
   int _selectedCategoryId;
   CompanyCategory _currentCompanyCategory;
@@ -207,7 +213,8 @@ class _MapPageState extends State<MapPage> {
                                     double.parse(company.coordY),
                                   ),
                                   icon: BitmapDescriptor.defaultMarkerWithHue(
-                                      120),
+                                    120,
+                                  ),
                                 ),
                               );
                             },
@@ -238,12 +245,52 @@ class _MapPageState extends State<MapPage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimaryColor,
-        child: Icon(Icons.location_searching),
-        onPressed: () {
-          getCurrentLocation();
-        },
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 12.0,
+          ),
+          Container(
+            height: 38.0,
+            child: FloatingActionButton.extended(
+              heroTag: null,
+              backgroundColor: kPrimaryColor,
+              onPressed: () {
+                int r = 6378137; // Earth’s mean radius in meter
+                double dLat = toRadius(_currentMarkers[1].position.latitude -
+                    myMarker.position.latitude);
+                double dLong = toRadius(_currentMarkers[1].position.longitude -
+                    myMarker.position.longitude);
+                double a = sin(dLat / 2) * sin(dLat / 2) +
+                    cos(toRadius(myMarker.position.latitude)) *
+                        cos(toRadius(_currentMarkers[1].position.latitude)) *
+                        sin(dLong / 2) *
+                        sin(dLong / 2);
+                double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+                double d = r * c;
+                int meterDistance = d.toInt();
+                _showAlertLoginFlash(meterDistance.toString() + " meter");
+              },
+              icon: Icon(Icons.near_me),
+              label: Text("Ойрхон"),
+            ),
+          ),
+          SizedBox(
+            width: 12.0,
+          ),
+          Container(
+            height: 38.0,
+            child: FloatingActionButton(
+              heroTag: null,
+              backgroundColor: kPrimaryColor,
+              child: Icon(Icons.location_searching),
+              onPressed: () {
+                getCurrentLocation();
+              },
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Container(
@@ -275,7 +322,9 @@ class _MapPageState extends State<MapPage> {
                 Expanded(
                   child: GoogleMap(
                     initialCameraPosition: initialLocation,
-                    markers: Set.from(_currentMarkers),
+                    markers: Set.of((myMarker != null)
+                        ? [myMarker] + _currentMarkers
+                        : _currentMarkers),
                     onMapCreated: (GoogleMapController controller) {
                       _googleMapController = controller;
                     },
@@ -406,5 +455,19 @@ class _MapPageState extends State<MapPage> {
         ),
       ),
     );
+  }
+
+  void _showAlertLoginFlash(String message) {
+    Flushbar(
+      margin: EdgeInsets.all(8),
+      borderRadius: 8,
+      message: message,
+      duration: Duration(seconds: 4),
+      icon: Icon(
+        Icons.near_me,
+        size: 28.0,
+        color: Colors.blue[300],
+      ),
+    )..show(context);
   }
 }
