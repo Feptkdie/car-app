@@ -30,6 +30,12 @@ class _MapPageState extends State<MapPage> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   Marker myMarker;
+  var _kAc1 = Colors.transparent;
+  final _kAc2 = Colors.white.withOpacity(0.9);
+  Duration _duration = Duration(milliseconds: 600);
+  List<int> meterDistance = [];
+  double _wAc = 0.0, _hAc = 0.0;
+  bool _loadNearby = true;
 
   CameraPosition initialLocation = CameraPosition(
     target: LatLng(47.9193279, 106.9178054),
@@ -257,20 +263,78 @@ class _MapPageState extends State<MapPage> {
               heroTag: null,
               backgroundColor: kPrimaryColor,
               onPressed: () {
-                int r = 6378137; // Earth’s mean radius in meter
-                double dLat = toRadius(_currentMarkers[1].position.latitude -
-                    myMarker.position.latitude);
-                double dLong = toRadius(_currentMarkers[1].position.longitude -
-                    myMarker.position.longitude);
-                double a = sin(dLat / 2) * sin(dLat / 2) +
-                    cos(toRadius(myMarker.position.latitude)) *
-                        cos(toRadius(_currentMarkers[1].position.latitude)) *
-                        sin(dLong / 2) *
-                        sin(dLong / 2);
-                double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-                double d = r * c;
-                int meterDistance = d.toInt();
-                _showAlertLoginFlash(meterDistance.toString() + " meter");
+                print("fuck you");
+                meterDistance.clear();
+                for (int i = 0;
+                    i < _currentCompanyCategory.companies.length;
+                    i++) {
+                  print(i);
+                  int r = 6378137; // Earth’s mean radius in meter
+                  double dLat = toRadius(_currentMarkers[i].position.latitude -
+                      myMarker.position.latitude);
+                  double dLong = toRadius(
+                      _currentMarkers[i].position.longitude -
+                          myMarker.position.longitude);
+                  double a = sin(dLat / 2) * sin(dLat / 2) +
+                      cos(toRadius(myMarker.position.latitude)) *
+                          cos(toRadius(_currentMarkers[i].position.latitude)) *
+                          sin(dLong / 2) *
+                          sin(dLong / 2);
+                  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+                  double d = r * c;
+                  meterDistance.add(d.toInt());
+                  print(meterDistance[i]);
+                }
+                setState(() {
+                  meterDistance.sort();
+                  Comparator<Company> nameComparator =
+                      (a, b) => a.name.compareTo(b.name);
+                  _currentCompanyCategory.companies.sort();
+                  _currentMarkers.clear();
+                  if (_currentCompanyCategory != null) {
+                    _currentCompanyCategory.companies.forEach(
+                      (Company company) {
+                        _currentMarkers.add(
+                          Marker(
+                            infoWindow: InfoWindow(
+                              title: company.name,
+                              snippet: "дэлгэрэнгүй харах",
+                              onTap: () {
+                                showSlideDialogInfo(context, company);
+                              },
+                            ),
+                            markerId: MarkerId(company.name),
+                            position: LatLng(
+                              double.parse(company.coordX),
+                              double.parse(company.coordY),
+                            ),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(
+                              120,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+
+                    var moveToPosition = LatLng(47.9193279, 106.9178054);
+                    if (_currentMarkers.length > 0) {
+                      moveToPosition = _currentMarkers[0].position;
+                    }
+
+                    _googleMapController.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        new CameraPosition(
+                          target: moveToPosition,
+                          tilt: 0,
+                          zoom: 12.4,
+                        ),
+                      ),
+                    );
+                  }
+                  _hAc = MediaQuery.of(context).size.height * 0.5;
+                  _wAc = 180.0;
+                  _loadNearby = false;
+                });
               },
               icon: Icon(Icons.near_me),
               label: Text("Ойрхон"),
@@ -306,28 +370,83 @@ class _MapPageState extends State<MapPage> {
               end: Alignment.bottomCenter,
             ),
           ),
-          child: Column(
+          child: Stack(
             children: [
-              if (_currentCompanyCategory == null)
-                Expanded(
-                  child: GoogleMap(
-                    initialCameraPosition: initialLocation,
-                    markers: Set.of((myMarker != null) ? [myMarker] : []),
-                    onMapCreated: (GoogleMapController controller) {
-                      _googleMapController = controller;
-                    },
-                  ),
-                ),
+              Column(
+                children: [
+                  if (_currentCompanyCategory == null)
+                    Expanded(
+                      child: GoogleMap(
+                        initialCameraPosition: initialLocation,
+                        markers: Set.of((myMarker != null) ? [myMarker] : []),
+                        onMapCreated: (GoogleMapController controller) {
+                          _googleMapController = controller;
+                        },
+                      ),
+                    ),
+                  if (_currentCompanyCategory != null)
+                    Expanded(
+                      child: GoogleMap(
+                        initialCameraPosition: initialLocation,
+                        markers: Set.of((myMarker != null)
+                            ? [myMarker] + _currentMarkers
+                            : _currentMarkers),
+                        onMapCreated: (GoogleMapController controller) {
+                          _googleMapController = controller;
+                        },
+                      ),
+                    ),
+                ],
+              ),
               if (_currentCompanyCategory != null)
-                Expanded(
-                  child: GoogleMap(
-                    initialCameraPosition: initialLocation,
-                    markers: Set.of((myMarker != null)
-                        ? [myMarker] + _currentMarkers
-                        : _currentMarkers),
-                    onMapCreated: (GoogleMapController controller) {
-                      _googleMapController = controller;
-                    },
+                Align(
+                  alignment: Alignment.topRight,
+                  child: AnimatedContainer(
+                    duration: _duration,
+                    curve: Curves.fastOutSlowIn,
+                    width: _wAc,
+                    height: _hAc,
+                    color: _kAc2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                        if (!_loadNearby)
+                          Container(
+                            height: _hAc - 50,
+                            width: _wAc,
+                            child: ListView.builder(
+                              itemCount: meterDistance.length,
+                              itemBuilder: (BuildContext context, int index) =>
+                                  Column(
+                                children: [
+                                  Text(_currentCompanyCategory
+                                      .companies[index].name),
+                                  Text(meterDistance[index].toString() + " m"),
+                                ],
+                              ),
+                            ),
+                          ),
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _hAc = 0.0;
+                              _wAc = 0.0;
+                              _loadNearby = true;
+                            });
+                          },
+                          child: Text("хаах"),
+                        ),
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
             ],
