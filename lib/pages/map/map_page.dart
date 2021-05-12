@@ -195,7 +195,7 @@ class _MapPageState extends State<MapPage> {
                     onChanged: (int value) {
                       print("onChanged: $value");
                       setState(() {
-                        _currentMarkers = [];
+                        _currentMarkers.clear();
                         _selectedCategoryId = value;
                         _currentCompanyCategory = _companyCategories.firstWhere(
                             (category) => category.id == value,
@@ -225,6 +225,67 @@ class _MapPageState extends State<MapPage> {
                               );
                             },
                           );
+
+                          meterDistance.clear();
+                          for (int i = 0;
+                              i < _currentCompanyCategory.companies.length;
+                              i++) {
+                            print(i);
+                            int r = 6378137; // Earth’s mean radius in meter
+                            double dLat = toRadius(
+                                _currentMarkers[i].position.latitude -
+                                    myMarker.position.latitude);
+                            double dLong = toRadius(
+                                _currentMarkers[i].position.longitude -
+                                    myMarker.position.longitude);
+                            double a = sin(dLat / 2) * sin(dLat / 2) +
+                                cos(toRadius(myMarker.position.latitude)) *
+                                    cos(toRadius(
+                                        _currentMarkers[i].position.latitude)) *
+                                    sin(dLong / 2) *
+                                    sin(dLong / 2);
+                            double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+                            double d = r * c;
+                            meterDistance.add(d.toInt());
+                            _currentCompanyCategory.companies[i].meter =
+                                d.toInt();
+                            print(meterDistance[i]);
+                          }
+
+                          _currentMarkers.clear();
+
+                          Comparator<Company> meterComparator =
+                              (a, b) => a.meter.compareTo(b.meter);
+                          _currentCompanyCategory.companies
+                              .sort(meterComparator);
+
+                          meterDistance.sort();
+
+                          if (_currentCompanyCategory != null) {
+                            _currentCompanyCategory.companies.forEach(
+                              (Company company) {
+                                _currentMarkers.add(
+                                  Marker(
+                                    infoWindow: InfoWindow(
+                                      title: company.name,
+                                      snippet: "дэлгэрэнгүй харах",
+                                      onTap: () {
+                                        showSlideDialogInfo(context, company);
+                                      },
+                                    ),
+                                    markerId: MarkerId(company.name),
+                                    position: LatLng(
+                                      double.parse(company.coordX),
+                                      double.parse(company.coordY),
+                                    ),
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      120,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
 
                           var moveToPosition = LatLng(47.9193279, 106.9178054);
                           if (_currentMarkers.length > 0) {
@@ -262,81 +323,7 @@ class _MapPageState extends State<MapPage> {
             child: FloatingActionButton.extended(
               heroTag: null,
               backgroundColor: kPrimaryColor,
-              onPressed: () {
-                print("fuck you");
-                meterDistance.clear();
-                for (int i = 0;
-                    i < _currentCompanyCategory.companies.length;
-                    i++) {
-                  print(i);
-                  int r = 6378137; // Earth’s mean radius in meter
-                  double dLat = toRadius(_currentMarkers[i].position.latitude -
-                      myMarker.position.latitude);
-                  double dLong = toRadius(
-                      _currentMarkers[i].position.longitude -
-                          myMarker.position.longitude);
-                  double a = sin(dLat / 2) * sin(dLat / 2) +
-                      cos(toRadius(myMarker.position.latitude)) *
-                          cos(toRadius(_currentMarkers[i].position.latitude)) *
-                          sin(dLong / 2) *
-                          sin(dLong / 2);
-                  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-                  double d = r * c;
-                  meterDistance.add(d.toInt());
-                  _currentCompanyCategory.companies[i].meter = d.toInt();
-                  print(meterDistance[i]);
-                }
-                setState(() {
-                  meterDistance.sort();
-                  Comparator<Company> meterComparator =
-                      (a, b) => a.meter.compareTo(b.meter);
-                  _currentCompanyCategory.companies.sort(meterComparator);
-                  _currentMarkers.clear();
-                  if (_currentCompanyCategory != null) {
-                    _currentCompanyCategory.companies.forEach(
-                      (Company company) {
-                        _currentMarkers.add(
-                          Marker(
-                            infoWindow: InfoWindow(
-                              title: company.name,
-                              snippet: "дэлгэрэнгүй харах",
-                              onTap: () {
-                                showSlideDialogInfo(context, company);
-                              },
-                            ),
-                            markerId: MarkerId(company.name),
-                            position: LatLng(
-                              double.parse(company.coordX),
-                              double.parse(company.coordY),
-                            ),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                              120,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-
-                    var moveToPosition = LatLng(47.9193279, 106.9178054);
-                    if (_currentMarkers.length > 0) {
-                      moveToPosition = _currentMarkers[0].position;
-                    }
-
-                    _googleMapController.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        new CameraPosition(
-                          target: moveToPosition,
-                          tilt: 0,
-                          zoom: 14.4,
-                        ),
-                      ),
-                    );
-                  }
-                  _hAc = MediaQuery.of(context).size.height * 0.3;
-                  _wAc = 180.0;
-                  _loadNearby = false;
-                });
-              },
+              onPressed: () {},
               icon: Icon(Icons.near_me),
               label: Text("Ойрхон"),
             ),
@@ -399,57 +386,6 @@ class _MapPageState extends State<MapPage> {
                     ),
                 ],
               ),
-              if (_currentCompanyCategory != null)
-                Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedContainer(
-                    duration: _duration,
-                    curve: Curves.fastOutSlowIn,
-                    width: _wAc,
-                    height: _hAc,
-                    color: _kAc2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        if (!_loadNearby)
-                          Container(
-                            height: _hAc - 50,
-                            width: _wAc,
-                            child: ListView.builder(
-                              itemCount: meterDistance.length,
-                              itemBuilder: (BuildContext context, int index) =>
-                                  Column(
-                                children: [
-                                  Text(_currentCompanyCategory
-                                      .companies[index].name),
-                                  Text(meterDistance[index].toString() + " m"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              _hAc = 0.0;
-                              _wAc = 0.0;
-                              _loadNearby = true;
-                            });
-                          },
-                          child: Text("хаах"),
-                        ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
