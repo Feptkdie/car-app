@@ -283,13 +283,14 @@ class _MapPageState extends State<MapPage> {
                   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
                   double d = r * c;
                   meterDistance.add(d.toInt());
+                  _currentCompanyCategory.companies[i].meter = d.toInt();
                   print(meterDistance[i]);
                 }
                 setState(() {
                   meterDistance.sort();
-                  Comparator<Company> nameComparator =
-                      (a, b) => a.name.compareTo(b.name);
-                  _currentCompanyCategory.companies.sort();
+                  Comparator<Company> meterComparator =
+                      (a, b) => a.meter.compareTo(b.meter);
+                  _currentCompanyCategory.companies.sort(meterComparator);
                   _currentMarkers.clear();
                   if (_currentCompanyCategory != null) {
                     _currentCompanyCategory.companies.forEach(
@@ -326,12 +327,12 @@ class _MapPageState extends State<MapPage> {
                         new CameraPosition(
                           target: moveToPosition,
                           tilt: 0,
-                          zoom: 12.4,
+                          zoom: 14.4,
                         ),
                       ),
                     );
                   }
-                  _hAc = MediaQuery.of(context).size.height * 0.5;
+                  _hAc = MediaQuery.of(context).size.height * 0.3;
                   _wAc = 180.0;
                   _loadNearby = false;
                 });

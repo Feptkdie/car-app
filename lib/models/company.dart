@@ -6,6 +6,7 @@ class Company {
   String coordX;
   String coordY;
   String jsonData;
+  int meter;
 
   Company({
     this.id,
@@ -15,6 +16,7 @@ class Company {
     this.coordX,
     this.coordY,
     this.jsonData,
+    this.meter,
   });
 
   factory Company.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Company {
       coordX: json["coordX"],
       coordY: json["coordY"],
       jsonData: json["jsonData"],
+      meter: json["meter"],
     );
   }
 }
