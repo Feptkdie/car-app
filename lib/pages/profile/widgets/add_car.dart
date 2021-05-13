@@ -21,6 +21,10 @@ class _AddCarState extends State<AddCar> {
   TextEditingController _nameController;
   TextEditingController _markNameController;
   TextEditingController _countryNumberController;
+  TextEditingController _viaNumber;
+  TextEditingController _madeInYear;
+  TextEditingController _importYear;
+  TextEditingController _color;
 
   String _curGroupName = "suudliin";
 
@@ -39,6 +43,10 @@ class _AddCarState extends State<AddCar> {
     _nameController = TextEditingController();
     _markNameController = TextEditingController();
     _countryNumberController = TextEditingController();
+    _viaNumber = TextEditingController();
+    _madeInYear = TextEditingController();
+    _importYear = TextEditingController();
+    _color = TextEditingController();
   }
 
   @override
@@ -157,6 +165,82 @@ class _AddCarState extends State<AddCar> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _viaNumber,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Арлын дугаар оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Арлын дугаар',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _madeInYear,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Үйлдвэрлсэн он оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Үйлдвэрлсэн он',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _importYear,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Импортлогдсон он оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Импортлогдсон он',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: _color,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Өнгө оруулна уу!';
+                        }
+                        if (value.length <= 2) {
+                          return 'Үсгийн хэмжээ бага байна!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Өнгө',
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 20.0),
                   SizedBox(
                     width: 100.0,
@@ -180,7 +264,11 @@ class _AddCarState extends State<AddCar> {
                               "group_name": _curGroupName,
                               "name": _nameController.text,
                               "mark_name": _markNameController.text,
-                              "country_number": _countryNumberController.text
+                              "country_number": _countryNumberController.text,
+                              "vin_number": _viaNumber.text,
+                              "made_in_year": _madeInYear.text,
+                              "import_year": _importYear.text,
+                              "color": _color.text,
                             };
 
                             var response = await http.post(

@@ -174,9 +174,10 @@ class _AddPartState extends State<AddPart> {
 
                               final Map<String, dynamic> formData = {
                                 "user_car_id": _userCarId,
-                                "category": _partCat,
+                                "type": _partCat,
                                 "name": _nameController.text,
-                                "where_made": _partWhereMade.text,
+                                "address": _partWhereMade.text,
+                                "replaced_item": "хоосон",
                                 "purchased_at": DateFormat('yyyy-MM-dd – kk:mm')
                                     .format(DateTime.now())
                                     .toString(),
@@ -187,7 +188,7 @@ class _AddPartState extends State<AddPart> {
                               };
 
                               var response = await http.post(
-                                AppUrl.baseURL + "/add-part",
+                                AppUrl.baseURL + "/profile-addpart",
                                 headers: {
                                   "Authorization": "Bearer $token",
                                   "Content-Type": "application/json",
