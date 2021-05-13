@@ -26,16 +26,12 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  RangeValues _currentRangeValues = const RangeValues(0, 15000);
   GoogleMapController _googleMapController;
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   Marker myMarker;
-  var _kAc1 = Colors.transparent;
-  final _kAc2 = Colors.white.withOpacity(0.9);
-  Duration _duration = Duration(milliseconds: 600);
   List<int> meterDistance = [];
-  double _wAc = 0.0, _hAc = 0.0;
-  bool _loadNearby = true;
 
   CameraPosition initialLocation = CameraPosition(
     target: LatLng(47.9193279, 106.9178054),
@@ -106,7 +102,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-
+    getCurrentLocation();
     _companyCategories =
         context.read<CompanyCategoryProvider>().getCompanyCategories;
   }
@@ -195,6 +191,7 @@ class _MapPageState extends State<MapPage> {
                     onChanged: (int value) {
                       print("onChanged: $value");
                       setState(() {
+                        meterDistance.clear();
                         _currentMarkers.clear();
                         _selectedCategoryId = value;
                         _currentCompanyCategory = _companyCategories.firstWhere(
@@ -225,45 +222,44 @@ class _MapPageState extends State<MapPage> {
                               );
                             },
                           );
+                        }
 
-                          meterDistance.clear();
-                          for (int i = 0;
-                              i < _currentCompanyCategory.companies.length;
-                              i++) {
-                            print(i);
-                            int r = 6378137; // Earth’s mean radius in meter
-                            double dLat = toRadius(
-                                _currentMarkers[i].position.latitude -
-                                    myMarker.position.latitude);
-                            double dLong = toRadius(
-                                _currentMarkers[i].position.longitude -
-                                    myMarker.position.longitude);
-                            double a = sin(dLat / 2) * sin(dLat / 2) +
-                                cos(toRadius(myMarker.position.latitude)) *
-                                    cos(toRadius(
-                                        _currentMarkers[i].position.latitude)) *
-                                    sin(dLong / 2) *
-                                    sin(dLong / 2);
-                            double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-                            double d = r * c;
-                            meterDistance.add(d.toInt());
-                            _currentCompanyCategory.companies[i].meter =
-                                d.toInt();
-                            print(meterDistance[i]);
-                          }
+                        for (int i = 0;
+                            i < _currentCompanyCategory.companies.length;
+                            i++) {
+                          int r = 6378137; // Earth’s mean radius in meter
+                          double dLat = toRadius(
+                              _currentMarkers[i].position.latitude -
+                                  myMarker.position.latitude);
+                          double dLong = toRadius(
+                              _currentMarkers[i].position.longitude -
+                                  myMarker.position.longitude);
+                          double a = sin(dLat / 2) * sin(dLat / 2) +
+                              cos(toRadius(myMarker.position.latitude)) *
+                                  cos(toRadius(
+                                      _currentMarkers[i].position.latitude)) *
+                                  sin(dLong / 2) *
+                                  sin(dLong / 2);
+                          double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+                          double d = r * c;
+                          meterDistance.add(d.toInt());
+                          _currentCompanyCategory.companies[i].meter =
+                              d.toInt();
+                        }
 
-                          _currentMarkers.clear();
+                        _currentMarkers.clear();
 
-                          Comparator<Company> meterComparator =
-                              (a, b) => a.meter.compareTo(b.meter);
-                          _currentCompanyCategory.companies
-                              .sort(meterComparator);
+                        Comparator<Company> meterComparator =
+                            (a, b) => a.meter.compareTo(b.meter);
+                        _currentCompanyCategory.companies.sort(meterComparator);
 
-                          meterDistance.sort();
+                        meterDistance.sort();
 
-                          if (_currentCompanyCategory != null) {
-                            _currentCompanyCategory.companies.forEach(
-                              (Company company) {
+                        if (_currentCompanyCategory != null) {
+                          _currentCompanyCategory.companies.forEach(
+                            (Company company) {
+                              if (company.meter <= _currentRangeValues.end &&
+                                  company.meter >= _currentRangeValues.start) {
                                 _currentMarkers.add(
                                   Marker(
                                     infoWindow: InfoWindow(
@@ -283,10 +279,15 @@ class _MapPageState extends State<MapPage> {
                                     ),
                                   ),
                                 );
-                              },
-                            );
-                          }
+                              }
+                            },
+                          );
+                        }
 
+                        if (_currentMarkers.isNotEmpty) {
+                          _showAlertLoginFlash(meterDistance[0].toString() +
+                              " m " +
+                              _currentCompanyCategory.companies[0].name);
                           var moveToPosition = LatLng(47.9193279, 106.9178054);
                           if (_currentMarkers.length > 0) {
                             moveToPosition = _currentMarkers[0].position;
@@ -297,10 +298,13 @@ class _MapPageState extends State<MapPage> {
                               new CameraPosition(
                                 target: moveToPosition,
                                 tilt: 0,
-                                zoom: 12.4,
+                                zoom: 14.4,
                               ),
                             ),
                           );
+                        } else {
+                          getCurrentLocation();
+                          _showAlertLoginFlash("Хамрах хүрээнд олдсонгүй!");
                         }
                       });
                     },
@@ -312,37 +316,13 @@ class _MapPageState extends State<MapPage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 12.0,
-          ),
-          Container(
-            height: 38.0,
-            child: FloatingActionButton.extended(
-              heroTag: null,
-              backgroundColor: kPrimaryColor,
-              onPressed: () {},
-              icon: Icon(Icons.near_me),
-              label: Text("Ойрхон"),
-            ),
-          ),
-          SizedBox(
-            width: 12.0,
-          ),
-          Container(
-            height: 38.0,
-            child: FloatingActionButton(
-              heroTag: null,
-              backgroundColor: kPrimaryColor,
-              child: Icon(Icons.location_searching),
-              onPressed: () {
-                getCurrentLocation();
-              },
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        backgroundColor: kPrimaryColor,
+        child: Icon(Icons.location_searching),
+        onPressed: () {
+          getCurrentLocation();
+        },
       ),
       body: SafeArea(
         child: Container(
@@ -385,6 +365,10 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                 ],
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: filters(),
               ),
             ],
           ),
@@ -509,6 +493,50 @@ class _MapPageState extends State<MapPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget filters() {
+    return Container(
+      height: 50.0,
+      margin: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            child: Image.asset(
+              "assets/images/setting.png",
+              width: 20.0,
+            ),
+          ),
+          SizedBox(width: 20.0),
+          Text("0 m"),
+          Expanded(
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: kColor1,
+                inactiveTrackColor: kPrimaryColor,
+                thumbColor: Colors.grey[100],
+              ),
+              child: RangeSlider(
+                values: _currentRangeValues,
+                min: 0,
+                max: 15000,
+                divisions: 2000,
+                labels: RangeLabels(
+                  _currentRangeValues.start.round().toString() + " m",
+                  _currentRangeValues.end.round().toString() + " m",
+                ),
+                onChanged: (RangeValues values) {
+                  setState(() {
+                    _currentRangeValues = values;
+                  });
+                },
+              ),
+            ),
+          ),
+          Text("15,000 m"),
+        ],
       ),
     );
   }
