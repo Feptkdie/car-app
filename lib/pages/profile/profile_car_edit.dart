@@ -9,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants.dart';
 
@@ -27,6 +26,7 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
   TextEditingController _nameController;
   TextEditingController _markNameController;
   TextEditingController _countryNumberController;
+  TextEditingController _color;
 
   String _carStringList;
   String _curGroupName = "suudliin";
@@ -75,6 +75,7 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
     _nameController = TextEditingController();
     _markNameController = TextEditingController();
     _countryNumberController = TextEditingController();
+    _color = TextEditingController();
 
     _userPrefs.then((User user) {
       print("user: $user");
@@ -87,6 +88,7 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
         _nameController.text = carList[0]["name"];
         _markNameController.text = carList[0]["mark_name"];
         _countryNumberController.text = carList[0]["country_number"];
+        _color.text = carList[0]["color"];
       }
     }).catchError((err) {
       print(err);
@@ -358,6 +360,25 @@ class _ProfileCarEditState extends State<ProfileCarEdit> {
                                         },
                                         decoration: InputDecoration(
                                           labelText: 'Улсын дугаар',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      child: TextFormField(
+                                        controller: _color,
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Өнгө оруулна уу!';
+                                          }
+                                          if (value.length <= 2) {
+                                            return 'Үсгийн хэмжээ бага байна!';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Өнгө',
                                         ),
                                       ),
                                     ),

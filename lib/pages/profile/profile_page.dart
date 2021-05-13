@@ -106,14 +106,20 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 height: height * 0.34,
                 width: double.infinity,
+                color: Colors.white.withOpacity(0.9),
                 child: (_currentCar != null && _currentCar["cover"] != null)
                     ? Image.network(
                         _currentCar["cover"],
                         fit: BoxFit.cover,
                       )
-                    : Image.asset(
-                        "assets/images/prius_profile.jpg",
-                        fit: BoxFit.cover,
+                    : Center(
+                        child: Text(
+                          "Машин бүртгээгүй байна",
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
                       ),
               ),
               Container(
