@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import 'package:carpro_app/helpers/user_preferences.dart';
 import 'package:carpro_app/models/user.dart';
 import 'package:carpro_app/providers/setting_provider.dart';
@@ -101,7 +102,7 @@ class _CarInfoState extends State<CarInfo> {
         children: [
           if (!["", " ", null, false, 0].contains(_currentCar))
             _profileCarInfo(),
-          if (["", " ", null, false, 0].contains(_currentCar)) _banner(),
+          // if (["", " ", null, false, 0].contains(_currentCar)) _banner(),
           // _sliderArrows(),
         ],
       ),
@@ -197,132 +198,52 @@ class _CarInfoState extends State<CarInfo> {
                     padding: EdgeInsets.only(bottom: widget.height * 0.02),
                     child: Container(
                       height: widget.height * 0.1,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(height: widget.height * 0.03),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                "assets/images/batery.png",
-                                height: widget.height * 0.026,
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                "Battery",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: widget.height * 0.012,
-                                ),
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                CarData.items[index]["battery"],
-                                style: TextStyle(
-                                  color: kLightRed,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: widget.height * 0.013,
-                                ),
-                              ),
-                            ],
+                      width: widget.width,
+                      child: AnimatedList(
+                        scrollDirection: Axis.horizontal,
+                        initialItemCount: cars[index]["parts"].length,
+                        itemBuilder: (BuildContext context, int index2,
+                                Animation<double> animation) =>
+                            Padding(
+                          padding: EdgeInsets.only(
+                            left: widget.width * 0.04,
+                            right: widget.width * 0.04,
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                "assets/images/araa.png",
-                                height: widget.height * 0.026,
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                "Хурдны хайрцаг",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: widget.height * 0.012,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(-1, 0),
+                              end: Offset(0, 0),
+                            ).animate(CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.bounceIn,
+                                reverseCurve: Curves.bounceOut)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  cars[index]["parts"][index2]["name"],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: widget.height * 0.012,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                CarData.items[index]["araa"],
-                                style: TextStyle(
-                                  color: kLightRed,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: widget.height * 0.013,
+                                SizedBox(
+                                  height: widget.height * 0.003,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  cars[index]["parts"][index2]["created_at"]
+                                      .toString()
+                                      .substring(0, 10),
+                                  style: TextStyle(
+                                    color: kLightRed,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: widget.height * 0.013,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                "assets/images/motor.png",
-                                height: widget.height * 0.026,
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                "Моторын багтаамж",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: widget.height * 0.012,
-                                ),
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                CarData.items[index]["motorcc"],
-                                style: TextStyle(
-                                  color: kLightRed,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: widget.height * 0.013,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                "assets/images/car.png",
-                                height: widget.height * 0.026,
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                "Төрөл",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: widget.height * 0.012,
-                                ),
-                              ),
-                              SizedBox(
-                                height: widget.height * 0.003,
-                              ),
-                              Text(
-                                CarData.items[index]["carType"],
-                                style: TextStyle(
-                                  color: kLightRed,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: widget.height * 0.013,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(height: widget.height * 0.03),
-                        ],
+                        ),
                       ),
                     ),
                   ),
